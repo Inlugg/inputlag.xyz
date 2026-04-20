@@ -24,12 +24,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* Твой фон с наложением затемнения */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                              url('i1583076866325242.jpeg'); 
+            /* Добавили no-repeat и center */
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('i1583076866325242.jpeg') no-repeat center center; 
             background-size: cover;
-            background-position: center;
-            background-attachment: scroll; /* Для мобилок лучше scroll, чтобы не было багов с прыгающим фоном */
             z-index: -1;
         }
 
