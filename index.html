@@ -10,65 +10,87 @@
             padding: 0;
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a; /* Темный фон на случай, если картинка не прогрузится */
+            background-color: #1a1a1a;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow-x: hidden; /* Защита от горизонтальной прокрутки */
         }
 
-        /* Настройки фонового изображения */
         .background-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            
-            /* --- ГДЕ И КАК ВСТАВИТЬ КАРТИНКУ --- */
-            /* 1. Замени ссылку ниже на прямую ссылку на твою картинку (например, из Гитхаба) */
-            /* Или, если картинка лежит в той же папке на Гитхабе, напиши просто 'твое_фото.jpg' */
+            /* Твой фон с наложением затемнения */
             background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
                               url('i1583076866325242.jpeg'); 
-            
-            background-size: cover;       /* Картинка растягивается на весь экран */
-            background-position: center;   /* Картинка центрируется */
-            background-attachment: fixed;  /* Картинка не скроллится */
-            z-index: -1;                   /* Картинка уходит на задний план */
+            background-size: cover;
+            background-position: center;
+            background-attachment: scroll; /* Для мобилок лучше scroll, чтобы не было багов с прыгающим фоном */
+            z-index: -1;
         }
 
-        /* Контейнер для текста */
+        /* На десктопах оставляем фиксацию фона */
+        @media (min-width: 1024px) {
+            .background-overlay {
+                background-attachment: fixed;
+            }
+        }
+
         .content-box {
-            background: rgba(0, 0, 0, 0.75); /* Полупрозрачное затемнение под текстом */
-            backdrop-filter: blur(8px);       /* Эффект размытия фона (Glassmorphism) */
-            padding: 50px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); /* Для поддержки Safari */
+            padding: 40px;
             border-radius: 20px;
             max-width: 750px;
-            width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.1); /* Тонкая рамка */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);   /* Тень для объема */
-            text-align: center;               /* Текст по центру */
+            width: 85%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            text-align: center;
+            margin: 20px;
         }
 
         h1 {
-            color: #ff4655; /* Красный акцент (в стиле Valorant) */
-            font-size: 2.8em;
-            margin-bottom: 25px;
+            color: #ff4655;
+            font-size: 2.5em;
+            margin-bottom: 20px;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         p {
-            line-height: 1.8;
-            font-size: 1.25em;
+            line-height: 1.6;
+            font-size: 1.2em;
             color: #f0f0f0;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .highlight {
-            color: #00ffcc; /* Бирюзовый акцент для важных слов */
+            color: #00ffcc;
             font-weight: bold;
+        }
+
+        /* --- АДАПТАЦИЯ ПОД ТЕЛЕФОНЫ --- */
+        @media (max-width: 600px) {
+            .content-box {
+                padding: 25px 15px;
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 1.6em;
+                letter-spacing: 1px;
+            }
+
+            p {
+                font-size: 1em;
+                line-height: 1.5;
+            }
         }
     </style>
 </head>
@@ -82,10 +104,10 @@
             Привет. Этот проект посвящен поиску и устранению причин задержки ввода (input lag) в соревновательных играх.
         </p>
         <p>
-            Я собираю результаты своих тестов, замеры задержек и гайды по оптимизации. Моя цель — разобраться, как <span class="highlight">настройки Windows</span>, электросеть и периферия влияют на регистрацию попаданий и отзывчивость управления.
+            Я собираю результаты своих тестов, замеры задержек и гайды по оптимизации. Моя цель — разобраться, как <span class="highlight">настройки Windows</span>, электросеть и периферия влияют на регистрацию попаданий.
         </p>
         <p>
-            Сайт находится в стадии активного наполнения. Скоро здесь появятся детальные отчеты.
+            Сайт в стадии наполнения. Скоро здесь появятся детальные отчеты.
         </p>
     </div>
 
