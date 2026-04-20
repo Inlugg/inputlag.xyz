@@ -1,57 +1,99 @@
+Без проблем, сделал чистый русский вариант без лишних технических деталей, ориентированный именно на твое исследование инпут лага и оптимизацию системы.
+
+Я подготовил код так, чтобы его было максимально легко редактировать, и добавил комментарии, куда вставлять картинку.
+
+Код для index.html (Чистый Русский Вариант + Фон):
+HTML
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Lag Research | inputlag.xyz</title>
-    <meta name="description" content="Technical analysis of input lag and EMI issues by Inlugg. Investigation into why the mouse feels heavy without grounding.">
+    <title>Inlugg | Исследование Input Lag</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #0d1117; color: #c9d1d9; }
-        h1 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 10px; text-align: center; }
-        h2 { color: #f0883e; margin-top: 40px; }
-        .card { background: #161b22; padding: 25px; border-radius: 10px; border: 1px solid #30363d; margin: 20px 0; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .bad { border-left: 4px solid #f85149; padding-left: 15px; }
-        .good { border-left: 4px solid #3fb950; padding-left: 15px; }
-        .highlight { color: #d2a8ff; font-weight: bold; }
-        footer { text-align: center; margin-top: 50px; font-size: 0.9em; color: #8b949e; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a; /* Темный фон на случай, если картинка не прогрузится */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Настройки фонового изображения */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            
+            /* --- ГДЕ И КАК ВСТАВИТЬ КАРТИНКУ --- */
+            /* 1. Замени ссылку ниже на прямую ссылку на твою картинку (например, из Гитхаба) */
+            /* Или, если картинка лежит в той же папке на Гитхабе, напиши просто 'твое_фото.jpg' */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                              url('https://images.alphacoders.com/109/1094380.jpg'); 
+            
+            background-size: cover;       /* Картинка растягивается на весь экран */
+            background-position: center;   /* Картинка центрируется */
+            background-attachment: fixed;  /* Картинка не скроллится */
+            z-index: -1;                   /* Картинка уходит на задний план */
+        }
+
+        /* Контейнер для текста */
+        .content-box {
+            background: rgba(0, 0, 0, 0.75); /* Полупрозрачное затемнение под текстом */
+            backdrop-filter: blur(8px);       /* Эффект размытия фона (Glassmorphism) */
+            padding: 50px;
+            border-radius: 20px;
+            max-width: 750px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Тонкая рамка */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);   /* Тень для объема */
+            text-align: center;               /* Текст по центру */
+        }
+
+        h1 {
+            color: #ff4655; /* Красный акцент (в стиле Valorant) */
+            font-size: 2.8em;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        p {
+            line-height: 1.8;
+            font-size: 1.25em;
+            color: #f0f0f0;
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            color: #00ffcc; /* Бирюзовый акцент для важных слов */
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Inlugg's Input Lag Investigation</h1>
-    
-    <div class="card">
-        <p>This project is a technical deep-dive into <strong>unexplained input lag</strong>. My research focuses on how electrical interference (EMI), lack of grounding, and high-end PSUs (like MSI MPG A750GF) affect modern gaming peripherals.</p>
+
+    <div class="background-overlay"></div>
+
+    <div class="content-box">
+        <h1>Inlugg's Input Lag Lab</h1>
+        <p>
+            Привет. Меня зовут <span class="highlight">Inlugg</span>, и этот проект посвящен поиску и устранению причин задержки ввода (input lag) в соревновательных играх.
+        </p>
+        <p>
+            Я собираю результаты своих тестов, замеры задержек и гайды по оптимизации. Моя цель — разобраться, как <span class="highlight">настройки Windows</span>, электросеть и периферия влияют на регистрацию попаданий и отзывчивость управления.
+        </p>
+        <p>
+            Сайт находится в стадии активного наполнения. Скоро здесь появятся детальные отчеты и графики.
+        </p>
     </div>
 
-    <h2>Current Observations</h2>
-    <div class="card">
-        <p>I've noticed a "building up" effect. After some time, the mouse sensor responsiveness degrades. This correlates with <span class="highlight">static shocks</span> from the metal microphone and case.</p>
-    </div>
-
-    <h2>Hardware Performance Comparison</h2>
-    <div class="stats-grid">
-        <div class="card bad">
-            <h3>Pulsar X2</h3>
-            <p>Status: <span style="color: #f85149;">Inconsistent</span></p>
-            <p>Sensitive controller reacts poorly to electrical noise. Result: <strong>2 - 10</strong> in Valorant.</p>
-        </div>
-        <div class="card good">
-            <h3>Razer DeathAdder V2</h3>
-            <p>Status: <span style="color: #3fb950;">Stable</span></p>
-            <p>More robust EMI shielding. Result: <strong>19 - 14</strong> in the same environment.</p>
-        </div>
-    </div>
-
-    <h2>Electrical Setup</h2>
-    <ul>
-        <li><strong>PSU:</strong> MSI MPG A750GF (Gold, high-frequency filtering).</li>
-        <li><strong>Condition:</strong> No grounding (Ground wire missing).</li>
-        <li><strong>Observation:</strong> Static electricity builds up on the USB GND bus.</li>
-    </ul>
-
-    <footer>
-        <p>&copy; 2026 Inlugg | inputlag.xyz investigation</p>
-    </footer>
 </body>
 </html>
