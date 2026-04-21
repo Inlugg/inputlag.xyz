@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя история | Input Lag Lab</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('i1583076866325242.jpeg') no-repeat center center; 
+            background-size: cover;
+            z-index: -1;
+        }
+
+        @media (min-width: 1024px) {
+            .background-overlay {
+                background-attachment: fixed;
+            }
+        }
+
+        .content-box {
+            margin: 60px 20px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 85%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            text-align: left;
+        }
+
+        h1 {
+            color: #ff4655;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            color: #00ffcc;
+            font-size: 1.6em;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+            padding-bottom: 5px;
+        }
+
+        p {
+            line-height: 1.7;
+            font-size: 1.15em;
+            color: #f0f0f0;
+            margin-bottom: 18px;
+        }
+
+        .highlight {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+
+        .quote-block {
+            border-left: 4px solid #00ffcc;
+            padding: 5px 20px;
+            background: rgba(0, 255, 204, 0.05);
+            margin: 25px 0;
+            font-style: italic;
+        }
+
+        /* Навигация */
+        nav {
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 25px;
+        }
+
+        nav a {
+            color: #00ffcc;
+            text-decoration: none;
+            margin-right: 25px;
+            font-weight: bold;
+            transition: 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        nav a:hover {
+            color: #ff4655;
+            text-shadow: 0 0 10px rgba(255, 70, 85, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .content-box { padding: 25px 15px; width: 90%; }
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.4em; }
+            p { font-size: 1em; }
+            nav a { display: block; margin-bottom: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-overlay"></div>
+
+    <div class="content-box">
+        <h1>Моя История</h1>
+        
+        <p>
+           ТЕСТ.
+        </p>
+
+        <h2>Как я это заметил</h2>
+        <p>
+            Тест <span class="highlight">inputlag.xyz</span>.
+        </p>
+
+        <div class="quote-block">
+            «ТЕСТ».
+        </div>
+
+        <h2>Что я тестирую сейчас</h2>
+        <p>
+            На данный момент я провожу замеры влияния различных <span class="highlight">настроек Windows</span> и фильтрации электросети. Я изучаю, как экранирование кабелей и стабильность напряжения влияют на микро-движения прицела в соревновательных шутерах.
+        </p>
+
+        <p>
+            Здесь скоро появятся мои личные отчеты, замеры задержек и список оборудования, которое реально помогло мне улучшить отзывчивость системы.
+        </p>
+
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="electricity.html">Электросеть</a>
+            <a href="mystory.html">Моя история</a>
+        </nav>
+    </div>
+
+</body>
+</html>
