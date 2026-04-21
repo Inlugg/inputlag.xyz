@@ -1,1 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Lag: Тесты, Гайды и Оптимизация системы</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden; /* Защита от горизонтальной прокрутки */
+        }
 
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Добавили no-repeat и center */
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('i1583076866325242.jpeg') no-repeat center center; 
+            background-size: cover;
+            z-index: -1;
+        }
+
+        /* На десктопах оставляем фиксацию фона */
+        @media (min-width: 1024px) {
+            .background-overlay {
+                background-attachment: fixed;
+            }
+        }
+
+        .content-box {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); /* Для поддержки Safari */
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 750px;
+            width: 85%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #ff4655;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        p {
+            line-height: 1.6;
+            font-size: 1.2em;
+            color: #f0f0f0;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+
+        /* --- АДАПТАЦИЯ ПОД ТЕЛЕФОНЫ --- */
+        @media (max-width: 600px) {
+            .content-box {
+                padding: 25px 15px;
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 1.6em;
+                letter-spacing: 1px;
+            }
+
+            p {
+                font-size: 1em;
+                line-height: 1.5;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-overlay"></div>
+
+    <div class="content-box">
+        <h1>Input Lag Lab</h1>
+        <p>
+            1. Электросеть тогда и сейчас (Импульсные блоки питания)
+Раньше холодильники и телевизоры были тяжелыми и работали на трансформаторных блоках питания. Они потребляли много тока, но не «мусорили» обратно в розетку высокочастотным шумом.
+
+Сейчас почти всё (зарядки телефонов, LED-лампы, блоки питания ПК, инверторные кондиционеры) — это импульсные блоки питания.
+
+Они работают на высоких частотах и выбрасывают в домашнюю сеть «шум», который может влиять на работу чувствительной электроники (например, на стабильность частоты опроса твоей мышки или тайминги оперативной памяти).
+
+Если в доме плохая проводка или нет заземления, этот «мусор» идет по общему проводу.
+        </p>
+        <p>
+            Я собираю результаты своих тестов, замеры задержек и гайды по оптимизации. Моя цель — разобраться, как <span class="highlight">настройки Windows</span>, электросеть и периферия влияют на регистрацию попаданий.
+        </p>
+        <p>
+            Сайт в стадии наполнения. Скоро здесь появятся детальные отчеты.
+        </p>
+    </div>
+
+</body>
+</html>
