@@ -1,114 +1,126 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="keywords" content="инпут лаг, input lag, заземление пк, электрический инпут лаг, 180 вольт в розетке, сенсор мыши плавает, valorant оптимизация, электросеть для геймера">
-<meta name="description" content="Личный опыт борьбы с инпут лагом: от заземления и просадок напряжения до настройки периферии. Лаборатория inputlag.xyz.">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Lag: Тесты, Гайды и Оптимизация системы</title>
+    
+    <title>Input Lag Lab: Тесты, Гайды и Оптимизация системы</title>
+    <meta name="description" content="Личный опыт борьбы с инпут лагом: от заземления и просадок напряжения до настройки периферии. Лаборатория inputlag.xyz.">
+    <meta name="keywords" content="инпут лаг, input lag, заземление пк, электрический инпут лаг, 180 вольт в розетке, сенсор мыши плавает, valorant оптимизация, электросеть для геймера">
+    
+    <link rel="canonical" href="https://inputlag.xyz/index.html">
+
+    <meta property="og:title" content="Input Lag Lab: Исследование задержки ввода">
+    <meta property="og:description" content="Как электросеть и заземление влияют на твой аим. Личный опыт и технические тесты.">
+    <meta property="og:url" content="https://inputlag.xyz/">
+    <meta property="og:type" content="website">
+
     <style>
-        /* Общие настройки страницы */
         body, html {
             margin: 0;
             padding: 0;
             min-height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: #1a1a1a;
-            color: white;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
         }
 
-        /* Фон */
         .background-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
                         url('i1583076866325242.jpeg') no-repeat center center; 
             background-size: cover;
             z-index: -1;
         }
 
         @media (min-width: 1024px) {
-            .background-overlay {
-                background-attachment: fixed;
-            }
+            .background-overlay { background-attachment: fixed; }
         }
 
-        /* Основной контейнер */
         .content-box {
             margin: 60px 20px;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
             padding: 40px;
             border-radius: 20px;
-            max-width: 750px;
-            width: 85%;
+            max-width: 800px;
+            width: 90%;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            text-align: left;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
         h1 {
             color: #ff4655;
-            font-size: 2.5em;
+            font-size: clamp(1.8em, 5vw, 2.8em);
             margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 2px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        p {
-            line-height: 1.6;
-            font-size: 1.2em;
-            color: #f0f0f0;
+        h2 {
+            color: #00ffcc;
+            margin-top: 35px;
             margin-bottom: 15px;
+            font-size: 1.6em;
+        }
+
+        p {
+            line-height: 1.7;
+            font-size: 1.15em;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            color: #f0f0f0;
+            font-size: 1.1em;
         }
 
         .highlight {
             color: #00ffcc;
-            font-weight: bold;
+            font-weight: 600;
         }
 
-        /* --- СТИЛИ НАВИГАЦИИ (МЕНЮ) --- */
         nav {
-            margin-top: 30px;
+            margin-top: 40px;
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
+            padding-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         nav a {
             color: #00ffcc;
             text-decoration: none;
-            margin-right: 20px;
             font-weight: bold;
             transition: 0.3s ease;
+            font-size: 1.1em;
         }
 
         nav a:hover {
-            color: #ff4655; /* Красный цвет при наведении */
+            color: #ff4655;
             text-shadow: 0 0 8px rgba(255, 70, 85, 0.5);
         }
 
-        /* Адаптация под мобилки */
         @media (max-width: 600px) {
-            .content-box {
-                padding: 25px 15px;
-                width: 90%;
-            }
-
-            h1 { font-size: 1.6em; }
-            p { font-size: 1em; }
-
-            nav a {
-                display: inline-block;
-                margin-bottom: 10px;
-            }
+            .content-box { padding: 25px; margin: 30px 15px; }
+            h2 { font-size: 1.3em; }
         }
     </style>
 </head>
@@ -116,47 +128,40 @@
 
     <div class="background-overlay"></div>
 
-    <div class="content-box">
+    <main class="content-box">
         <h1>Input Lag Lab</h1>
-        <p>
-            Привет. «Этот проект посвящен исследованию и устранению влияния электрической составляющей на input lag в соревновательных дисциплинах».
-        </p>
-        <p>
-  <h2>Что такое Input Lag на самом деле?</h2>
-Если максимально просто: Input Lag (задержка ввода) — это время, которое требуется системе, чтобы превратить твое физическое действие (клик мышкой или нажатие клавиши) в видимый результат на экране (выстрел или движение персонажа).
-Многие путают это с сетевым пингом, но это разные вещи. Пинг — это задержка связи с сервером. Инпут лаг — это задержка внутри твоего рабочего места.
-        </p>
-        <p>
-          Цепочка, где теряются миллисекунды:
-              <p>
-1. Задержка не возникает в одном месте, она суммируется на каждом этапе «пути» сигнала:
-  <p>
-2. Периферия: Как быстро контроллер мыши обработал нажатие.
-  <p>
-3. Шина USB и ПК: Насколько быстро сигнал прошел через материнскую плату к процессору.
-  <p>
-4. Система (Windows): Сколько времени ушло на обработку кадра в очереди рендеринга.
-  <p>
-5. Монитор: Как быстро матрица смогла отобразить обновленный пиксель.
-            </p>
-        <p>
-Почему мы за этим охотимся?
-В соревновательных шутерах, таких как Valorant или CS, борьба идет за миллисекунды. Высокий инпут лаг создает ощущение, что прицел «плавает», он как будто привязан на резинке и всегда немного отстает от твоей руки.
+        
+        <p>Привет. Этот проект посвящен исследованию и устранению влияния <span class="highlight">электрической составляющей</span> на input lag в соревновательных дисциплинах.</p>
 
-Когда задержка минимальна, ты получаешь то самое чувство «прямого контакта» с игрой: прицел становится резким, а выстрелы регистрируются именно в тот момент, когда ты нажал на кнопку, а не мгновением позже.
+        <h2>Что такое Input Lag на самом деле?</h2>
+        <p>Если максимально просто: <strong>Input Lag (задержка ввода)</strong> — это время, которое требуется системе, чтобы превратить твое физическое действие в видимый результат на экране. Многие путают это с сетевым пингом, но это разные вещи. Пинг — это задержка связи с сервером, а инпут лаг — это задержка внутри твоего рабочего места.</p>
 
-Важно: На этом сайте мы рассматриваем не только очевидные настройки Windows, но и то, как на эту задержку влияют фундаментальные вещи: качество электросети в твоем доме, наводки и даже отсутствие заземления.
-         </p>
-        <p>
+        <h2>Цепочка, где теряются миллисекунды</h2>
+        <p>Задержка не возникает в одном месте, она суммируется на каждом этапе:</p>
+        <ul>
+            <li><span class="highlight">Периферия:</span> Как быстро контроллер мыши обработал нажатие.</li>
+            <li><span class="highlight">Шина USB и ПК:</span> Скорость прохождения сигнала через материнскую плату.</li>
+            <li><span class="highlight">Система (Windows):</span> Время на обработку кадра в очереди рендеринга.</li>
+            <li><span class="highlight">Монитор:</span> Скорость отображения обновленного пикселя матрицей.</li>
+        </ul>
+
+        <h2>Почему мы за этим охотимся?</h2>
+        <p>В соревновательных шутерах, таких как <span class="highlight">Valorant или CS</span>, борьба идет за миллисекунды. Высокий инпут лаг создает ощущение, что прицел «плавает», он как будто привязан на резинке и всегда немного отстает от твоей руки.</p>
+        
+        <p>Когда задержка минимальна, ты получаешь чувство прямого контакта: прицел становится резким, а выстрелы регистрируются мгновенно.</p>
+
+        <p><strong>Важно:</strong> На этом сайте мы рассматриваем не только настройки Windows, но и то, как на эту задержку влияют фундаментальные вещи: качество электросети, наводки и отсутствие заземления.</p>
+
+        <p style="border-left: 4px solid #ff4655; padding-left: 15px; color: #888; margin-top: 30px;">
             Сайт в стадии наполнения. Скоро здесь появятся детальные отчеты.
         </p>
 
         <nav>
             <a href="index.html">Главная</a>
             <a href="electricity.html">Электросеть</a>
-            <a href="mystory.html">Моя история и обсуждения</a>
+            <a href="mystory.html">Моя история</a>
         </nav>
-    </div>
+    </main>
 
 </body>
 </html>
