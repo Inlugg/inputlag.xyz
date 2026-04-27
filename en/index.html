@@ -3,40 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Lag Lab | Gaming & Electricity Research</title>
-    <link rel="alternate" hreflang="ru" href="https://inputlag.xyz/index.html" />
-    <link rel="alternate" hreflang="en" href="https://inputlag.xyz/en/index.html" />
+    
+    <title>Input Lag Lab: Research, Guides & System Optimization</title>
+    <meta name="description" content="A personal journey of battling input lag: from grounding and voltage drops to peripheral tuning. The inputlag.xyz laboratory.">
+    <meta name="keywords" content="input lag, pc grounding, electrical input lag, 180v power grid, floaty mouse sensor, valorant optimization, dirty electricity gaming">
+    
+    <link rel="canonical" href="https://inputlag.xyz/en/index.html">
+
+    <meta property="og:title" content="Input Lag Lab: Investigating Input Latency">
+    <meta property="og:description" content="How the power grid and grounding affect your aim. Personal experience and technical testing.">
+    <meta property="og:url" content="https://inputlag.xyz/en/">
+    <meta property="og:type" content="website">
+
     <style>
-        /* CSS remains the same as in your RU version */
-        body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; }
-        .background-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../i1583076866325242.jpeg') no-repeat center center; background-size: cover; z-index: -1; }
-        .content-box { margin: 60px 20px; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; max-width: 800px; width: 85%; border: 1px solid rgba(255, 255, 255, 0.1); }
-        h1 { color: #ff4655; text-transform: uppercase; letter-spacing: 2px; }
-        .highlight { color: #00ffcc; font-weight: bold; }
-        nav { margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; }
-        nav a { color: #00ffcc; text-decoration: none; margin-right: 25px; font-weight: bold; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
+                        url('../i1583076866325242.jpeg') no-repeat center center; 
+            background-size: cover;
+            z-index: -1;
+        }
+
+        @media (min-width: 1024px) {
+            .background-overlay { background-attachment: fixed; }
+        }
+
+        .content-box {
+            margin: 60px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        h1 {
+            color: #ff4655;
+            font-size: clamp(1.8em, 5vw, 2.8em);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            color: #00ffcc;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            font-size: 1.6em;
+        }
+
+        p {
+            line-height: 1.7;
+            font-size: 1.15em;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            color: #f0f0f0;
+            font-size: 1.1em;
+        }
+
+        .highlight {
+            color: #00ffcc;
+            font-weight: 600;
+        }
+
+        nav {
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #00ffcc;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        nav a:hover {
+            color: #ff4655;
+            text-shadow: 0 0 8px rgba(255, 70, 85, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            .content-box { padding: 25px; margin: 30px 15px; }
+            h2 { font-size: 1.3em; }
+        }
     </style>
 </head>
 <body>
+
     <div class="background-overlay"></div>
-    <div class="content-box">
-        <div style="text-align: right;"><a href="../index.html" style="color: #00ffcc; text-decoration: none;">RU</a> | EN</div>
-        <h1>Input Lag Lab</h1>
-        <p>Hi. This project is dedicated to researching and eliminating the impact of the <span class="highlight">electrical component</span> on input lag in competitive gaming.</p>
+
+    <main class="content-box">
+        <div style="text-align: right; margin-bottom: 10px;">
+            <a href="../index.html" style="color: #00ffcc; text-decoration: none;">RU</a> | 
+            <span style="color: #fff; font-weight: bold;">EN</span>
+        </div>
         
+        <h1>Input Lag Lab</h1>
+        
+        <p>Hello. This project is dedicated to researching and eliminating the impact of the <span class="highlight">electrical component</span> on input lag in competitive gaming.</p>
+
         <h2>What is Input Lag, really?</h2>
-        <p>Input Lag is the time it takes for your system to turn a physical action into a visible result on the screen. It’s often confused with ping, but they are different. Ping is network latency; Input Lag is internal latency.</p>
+        <p>To put it simply: <strong>Input Lag</strong> is the time it takes for your system to turn a physical action into a visible result on the screen. It is often confused with network ping, but they are entirely different. Ping is the delay in communication with a server; input lag is the delay within your local workstation.</p>
+
+        <h2>The chain where milliseconds are lost</h2>
+        <p>Latency doesn't occur in just one place; it accumulates at every stage:</p>
+        <ul>
+            <li><span class="highlight">Peripherals:</span> How fast the mouse controller processes the click/movement.</li>
+            <li><span class="highlight">USB Bus & PC:</span> The speed of signal transmission through the motherboard.</li>
+            <li><span class="highlight">System (Windows):</span> Time spent processing the frame in the render queue.</li>
+            <li><span class="highlight">Monitor:</span> How fast the matrix displays the updated pixels.</li>
+        </ul>
 
         <h2>Why are we hunting this?</h2>
-        <p>In games like <span class="highlight">Valorant</span> or <span class="highlight">CS</span>, every millisecond counts. High input lag makes your aim feel "floaty" or "heavy," as if your crosshair is attached to a rubber band.</p>
+        <p>In competitive shooters like <span class="highlight">Valorant or CS</span>, the battle is fought over milliseconds. High input lag creates a "floaty" sensation—as if your crosshair is attached to a rubber band and is always slightly lagging behind your hand.</p>
         
-        <p><strong>Note:</strong> We look beyond Windows tweaks, focusing on how power grid quality and grounding issues affect your performance.</p>
+        <p>When latency is minimized, you get a sense of direct contact: your aim becomes sharp, and shots register instantly.</p>
+
+        <p><strong>Important:</strong> On this site, we look beyond Windows settings to fundamental issues: power grid quality, electromagnetic interference (EMI), and lack of grounding.</p>
+
+        <p style="border-left: 4px solid #ff4655; padding-left: 15px; color: #888; margin-top: 30px;">
+            Site is currently under construction. Detailed reports and testing results are coming soon.
+        </p>
 
         <nav>
             <a href="index.html">Home</a>
-            <a href="electricity.html">Electricity & EMI</a>
+            <a href="electricity.html">Power Grid</a>
             <a href="mystory.html">My Story</a>
         </nav>
-    </div>
+    </main>
+
 </body>
 </html>
