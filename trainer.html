@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мини Разминка: Трекинг и Инпут Лаг | Input Lag Lab</title>
-    
+    <title>Aim Tracking Test | Input Lag Lab</title>
     <style>
         body, html {
             margin: 0; padding: 0; min-height: 100%;
@@ -28,57 +27,39 @@
             text-align: center;
         }
 
-        h1 { color: #ff4655; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-        .subtitle { color: #888; margin-bottom: 30px; font-style: italic; }
-
-        #game-container { width: 100%; max-width: 700px; margin: 0 auto; }
-
-        #stats-bar {
-            display: flex; justify-content: space-between; padding: 15px;
-            background: rgba(255, 255, 255, 0.05); border-radius: 12px 12px 0 0;
-            border: 1px solid rgba(0, 255, 204, 0.1); font-weight: bold; color: #00ffcc;
-        }
+        h1 { color: #ff4655; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
 
         #game-field {
             width: 100%; height: 450px; background: #050505;
-            border: 1px solid rgba(0, 255, 204, 0.2); border-top: none;
-            position: relative; overflow: hidden; cursor: none; /* Скрываем курсор в игре */
-            border-radius: 0 0 12px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative; overflow: hidden; cursor: none;
+            border-radius: 12px;
         }
 
-        /* Змейка/Курсор */
-        #snake-head {
-            width: 18px; height: 18px; background: #00ffcc;
+        /* Прицел (маленький шарик) */
+        #aim-dot {
+            width: 10px; height: 10px; background: #00ffcc;
             border-radius: 50%; position: absolute;
-            box-shadow: 0 0 15px #00ffcc; pointer-events: none;
-            display: none; z-index: 10;
+            pointer-events: none; display: none; z-index: 10;
         }
 
-        /* Корзина/Цель */
-        #basket {
-            width: 60px; height: 60px; font-size: 35px;
-            display: none; align-items: center; justify-content: center;
-            position: absolute; background: rgba(0, 255, 204, 0.05);
-            border: 2px dashed #ff4655; border-radius: 12px;
-            box-shadow: inset 0 0 10px rgba(255, 70, 85, 0.2);
+        /* Цель (большой шарик) */
+        #target-ball {
+            width: 50px; height: 50px; background: #ff4655;
+            border-radius: 50%; position: absolute; display: none;
+            box-shadow: 0 0 20px rgba(255, 70, 85, 0.4);
         }
 
-        #start-screen {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); text-align: center; width: 80%;
-        }
+        #stats { margin-bottom: 15px; font-size: 1.2em; color: #00ffcc; font-weight: bold; }
 
         .btn {
             padding: 15px 40px; background: #ff4655; color: white;
             border: none; border-radius: 8px; font-weight: bold;
-            cursor: pointer; text-transform: uppercase; transition: 0.3s;
+            cursor: pointer; text-transform: uppercase;
         }
 
-        .btn:hover { background: #ff5f6d; box-shadow: 0 0 20px rgba(255, 70, 85, 0.4); }
-
         nav { margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: left; }
-        nav a { color: #00ffcc; text-decoration: none; margin-right: 25px; font-weight: bold; transition: 0.3s; }
-        nav a:hover { color: #ff4655; }
+        nav a { color: #00ffcc; text-decoration: none; margin-right: 25px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -86,30 +67,15 @@
     <div class="background-overlay"></div>
 
     <main class="content-box">
-        <div style="text-align: right; margin-bottom: 10px;">
-            <span style="color: #fff; font-weight: bold;">RU</span> | 
-            <a href="en/trainer.html" style="color: #00ffcc; text-decoration: none;">EN</a>
-        </div>
+        <h1>Разминка Трекинга</h1>
+        <div id="stats">Собрано целей: <span id="score">0</span></div>
 
-        <h1>Мини Разминка</h1>
-        <p class="subtitle">Тренировка трекинга: веди змейку в корзину</p>
-
-        <div id="game-container">
-            <div id="stats-bar">
-                <span>Целей: <span id="score">0</span></span>
-                <span>Твой пинг системы: <span id="status">Тест связи</span></span>
-            </div>
-            <div id="game-field">
-                <div id="snake-head"></div>
-                <div id="basket">🗑️</div>
-                
-                <div id="start-screen">
-                    <p style="color: #e0e0e0; margin-bottom: 20px;">
-                        В этой версии мы тестируем <b>плавность (smoothness)</b>.<br>
-                        Удерживай светящуюся точку и веди её в корзину.
-                    </p>
-                    <button class="btn" onclick="startGame()">Начать трекинг</button>
-                </div>
+        <div id="game-field">
+            <div id="aim-dot"></div>
+            <div id="target-ball"></div>
+            
+            <div id="start-screen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <button class="btn" onclick="startGame()">Начать тест</button>
             </div>
         </div>
 
@@ -121,64 +87,50 @@
     </main>
 
     <script>
-        const head = document.getElementById('snake-head');
-        const basket = document.getElementById('basket');
+        const dot = document.getElementById('aim-dot');
+        const ball = document.getElementById('target-ball');
         const field = document.getElementById('game-field');
         const scoreEl = document.getElementById('score');
-        const statusEl = document.getElementById('status');
         const startScreen = document.getElementById('start-screen');
         
         let score = 0;
-        let gameActive = false;
 
         function startGame() {
             score = 0;
             scoreEl.textContent = score;
-            statusEl.textContent = "ВЕДИ!";
             startScreen.style.display = 'none';
-            head.style.display = 'block';
-            basket.style.display = 'flex';
-            
-            moveBasket();
+            dot.style.display = 'block';
+            ball.style.display = 'block';
+            moveBall();
 
             field.onmousemove = (e) => {
-                if (!gameActive && startScreen.style.display === 'none') gameActive = true;
-                
                 const rect = field.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
 
-                // Точка следует за курсором
-                head.style.left = (x - 9) + 'px';
-                head.style.top = (y - 9) + 'px';
+                dot.style.left = (x - 5) + 'px';
+                dot.style.top = (y - 5) + 'px';
 
                 checkCollision(x, y);
             };
         }
 
-        function moveBasket() {
-            const maxX = field.clientWidth - 70;
-            const maxY = field.clientHeight - 70;
-            const x = Math.random() * maxX + 5;
-            const y = Math.random() * maxY + 5;
-            
-            basket.style.left = x + 'px';
-            basket.style.top = y + 'px';
+        function moveBall() {
+            const maxX = field.clientWidth - 55;
+            const maxY = field.clientHeight - 55;
+            ball.style.left = (Math.random() * maxX + 5) + 'px';
+            ball.style.top = (Math.random() * maxY + 5) + 'px';
         }
 
         function checkCollision(x, y) {
-            const bX = parseInt(basket.style.left);
-            const bY = parseInt(basket.style.top);
+            const bX = parseInt(ball.style.left);
+            const bY = parseInt(ball.style.top);
 
-            // Если центр точки попал в область корзины (60x60)
-            if (x > bX && x < bX + 60 && y > bY && y < bY + 60) {
+            // Если маленький шарик коснулся большого (50x50)
+            if (x > bX && x < bX + 50 && y > bY && y < bY + 50) {
                 score++;
                 scoreEl.textContent = score;
-                moveBasket();
-                
-                // Легкая вспышка рамки при попадании
-                field.style.borderColor = '#00ffcc';
-                setTimeout(() => { field.style.borderColor = 'rgba(0, 255, 204, 0.2)'; }, 100);
+                moveBall();
             }
         }
     </script>
