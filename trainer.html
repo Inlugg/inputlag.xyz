@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мини-разминка: Проверь свой аим и инпут лаг | Input Lag Lab</title>
+    <title>Мини Разминка: Трекинг и Инпут Лаг | Input Lag Lab</title>
     
     <style>
         body, html {
@@ -31,72 +31,52 @@
         h1 { color: #ff4655; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
         .subtitle { color: #888; margin-bottom: 30px; font-style: italic; }
 
-        /* Стили тренажера */
-        #game-container {
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto;
-        }
+        #game-container { width: 100%; max-width: 700px; margin: 0 auto; }
 
         #stats-bar {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px 12px 0 0;
-            border: 1px solid rgba(0, 255, 204, 0.1);
-            font-weight: bold;
-            color: #00ffcc;
+            display: flex; justify-content: space-between; padding: 15px;
+            background: rgba(255, 255, 255, 0.05); border-radius: 12px 12px 0 0;
+            border: 1px solid rgba(0, 255, 204, 0.1); font-weight: bold; color: #00ffcc;
         }
 
         #game-field {
-            width: 100%;
-            height: 450px;
-            background: #050505;
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            border-top: none;
-            position: relative;
-            overflow: hidden;
-            cursor: crosshair;
+            width: 100%; height: 450px; background: #050505;
+            border: 1px solid rgba(0, 255, 204, 0.2); border-top: none;
+            position: relative; overflow: hidden; cursor: none; /* Скрываем курсор в игре */
             border-radius: 0 0 12px 12px;
         }
 
-        .target {
-            width: 25px;
-            height: 25px;
-            background: #ff4655;
-            border-radius: 50%;
-            position: absolute;
-            box-shadow: 0 0 15px #ff4655;
-            cursor: pointer;
-            transition: transform 0.1s;
+        /* Змейка/Курсор */
+        #snake-head {
+            width: 18px; height: 18px; background: #00ffcc;
+            border-radius: 50%; position: absolute;
+            box-shadow: 0 0 15px #00ffcc; pointer-events: none;
+            display: none; z-index: 10;
         }
 
-        .target:active { transform: scale(0.8); }
+        /* Корзина/Цель */
+        #basket {
+            width: 60px; height: 60px; font-size: 35px;
+            display: none; align-items: center; justify-content: center;
+            position: absolute; background: rgba(0, 255, 204, 0.05);
+            border: 2px dashed #ff4655; border-radius: 12px;
+            box-shadow: inset 0 0 10px rgba(255, 70, 85, 0.2);
+        }
 
         #start-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); text-align: center; width: 80%;
         }
 
         .btn {
-            padding: 15px 40px;
-            background: #ff4655;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.3s;
+            padding: 15px 40px; background: #ff4655; color: white;
+            border: none; border-radius: 8px; font-weight: bold;
+            cursor: pointer; text-transform: uppercase; transition: 0.3s;
         }
 
         .btn:hover { background: #ff5f6d; box-shadow: 0 0 20px rgba(255, 70, 85, 0.4); }
 
-        nav { margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: left; width: 100%; }
+        nav { margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: left; }
         nav a { color: #00ffcc; text-decoration: none; margin-right: 25px; font-weight: bold; transition: 0.3s; }
         nav a:hover { color: #ff4655; }
     </style>
@@ -112,18 +92,23 @@
         </div>
 
         <h1>Мини Разминка</h1>
-        <p class="subtitle">Проверь регистрацию выстрелов и отзывчивость сенсора</p>
+        <p class="subtitle">Тренировка трекинга: веди змейку в корзину</p>
 
         <div id="game-container">
             <div id="stats-bar">
-                <span>Счет: <span id="score">0</span></span>
-                <span>Время: <span id="timer">30</span>с</span>
-                <span>Точность: <span id="accuracy">100</span>%</span>
+                <span>Целей: <span id="score">0</span></span>
+                <span>Твой пинг системы: <span id="status">Тест связи</span></span>
             </div>
             <div id="game-field">
+                <div id="snake-head"></div>
+                <div id="basket">🗑️</div>
+                
                 <div id="start-screen">
-                    <p style="margin-bottom: 20px; color: #e0e0e0;">У тебя есть 30 секунд.<br>Кликай по красным мишеням как можно быстрее.</p>
-                    <button class="btn" onclick="startGame()">Начать тест</button>
+                    <p style="color: #e0e0e0; margin-bottom: 20px;">
+                        В этой версии мы тестируем <b>плавность (smoothness)</b>.<br>
+                        Удерживай светящуюся точку и веди её в корзину.
+                    </p>
+                    <button class="btn" onclick="startGame()">Начать трекинг</button>
                 </div>
             </div>
         </div>
@@ -136,89 +121,65 @@
     </main>
 
     <script>
-        let score = 0;
-        let totalClicks = 0;
-        let timeLeft = 30;
-        let gameActive = false;
-        let timerId;
-
+        const head = document.getElementById('snake-head');
+        const basket = document.getElementById('basket');
         const field = document.getElementById('game-field');
-        const scoreDisplay = document.getElementById('score');
-        const timerDisplay = document.getElementById('timer');
-        const accDisplay = document.getElementById('accuracy');
+        const scoreEl = document.getElementById('score');
+        const statusEl = document.getElementById('status');
+        const startScreen = document.getElementById('start-screen');
+        
+        let score = 0;
+        let gameActive = false;
 
         function startGame() {
             score = 0;
-            totalClicks = 0;
-            timeLeft = 30;
-            gameActive = true;
+            scoreEl.textContent = score;
+            statusEl.textContent = "ВЕДИ!";
+            startScreen.style.display = 'none';
+            head.style.display = 'block';
+            basket.style.display = 'flex';
             
-            scoreDisplay.textContent = '0';
-            timerDisplay.textContent = '30';
-            accDisplay.textContent = '100';
-            
-            document.getElementById('start-screen').style.display = 'none';
-            
-            field.addEventListener('mousedown', countMiss);
-            
-            spawnTarget();
-            
-            timerId = setInterval(() => {
-                timeLeft--;
-                timerDisplay.textContent = timeLeft;
-                if (timeLeft <= 0) endGame();
-            }, 1000);
+            moveBasket();
+
+            field.onmousemove = (e) => {
+                if (!gameActive && startScreen.style.display === 'none') gameActive = true;
+                
+                const rect = field.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Точка следует за курсором
+                head.style.left = (x - 9) + 'px';
+                head.style.top = (y - 9) + 'px';
+
+                checkCollision(x, y);
+            };
         }
 
-        function spawnTarget() {
-            if (!gameActive) return;
+        function moveBasket() {
+            const maxX = field.clientWidth - 70;
+            const maxY = field.clientHeight - 70;
+            const x = Math.random() * maxX + 5;
+            const y = Math.random() * maxY + 5;
             
-            const target = document.createElement('div');
-            target.className = 'target';
-            
-            const x = Math.random() * (field.clientWidth - 40) + 5;
-            const y = Math.random() * (field.clientHeight - 40) + 5;
-            
-            target.style.left = x + 'px';
-            target.style.top = y + 'px';
-            
-            target.addEventListener('mousedown', (e) => {
-                e.stopPropagation(); // Чтобы не считался промах по полю
+            basket.style.left = x + 'px';
+            basket.style.top = y + 'px';
+        }
+
+        function checkCollision(x, y) {
+            const bX = parseInt(basket.style.left);
+            const bY = parseInt(basket.style.top);
+
+            // Если центр точки попал в область корзины (60x60)
+            if (x > bX && x < bX + 60 && y > bY && y < bY + 60) {
                 score++;
-                totalClicks++;
-                scoreDisplay.textContent = score;
-                updateAccuracy();
-                target.remove();
-                spawnTarget();
-            });
-            
-            field.appendChild(target);
-        }
-
-        function countMiss() {
-            if (!gameActive) return;
-            totalClicks++;
-            updateAccuracy();
-        }
-
-        function updateAccuracy() {
-            const acc = totalClicks === 0 ? 100 : Math.round((score / totalClicks) * 100);
-            accDisplay.textContent = acc;
-        }
-
-        function endGame() {
-            gameActive = false;
-            clearInterval(timerId);
-            field.removeEventListener('mousedown', countMiss);
-            
-            field.innerHTML = `
-                <div id="start-screen">
-                    <h2 style="color: #ff4655;">Время вышло!</h2>
-                    <p style="font-size: 1.5em; margin: 10px 0;">Твой счет: ${score}</p>
-                    <p style="margin-bottom: 20px;">Точность: ${accDisplay.textContent}%</p>
-                    <button class="btn" onclick="location.reload()">Попробовать снова</button>
-                </div>
-            `;
+                scoreEl.textContent = score;
+                moveBasket();
+                
+                // Легкая вспышка рамки при попадании
+                field.style.borderColor = '#00ffcc';
+                setTimeout(() => { field.style.borderColor = 'rgba(0, 255, 204, 0.2)'; }, 100);
+            }
         }
     </script>
 </body>
