@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Electricity & EMI: Why Your Sensor Floats | Input Lag Lab</title>
+    <link rel="alternate" hreflang="ru" href="https://inputlag.xyz/electricity.html" />
+    <link rel="alternate" hreflang="en" href="https://inputlag.xyz/en/electricity.html" />
+    <style>
+        body, html { margin: 0; padding: 0; background-color: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; }
+        .background-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('../i1583076866325242.jpeg') no-repeat center center; background-size: cover; z-index: -1; }
+        .content-box { margin: 60px 20px; background: rgba(0,0,0,0.85); padding: 40px; border-radius: 20px; max-width: 800px; border: 1px solid #00ffcc33; }
+        h1 { color: #ff4655; }
+        h2 { color: #00ffcc; border-bottom: 1px solid #00ffcc33; padding-bottom: 10px; }
+        .info-block { border-left: 4px solid #00ffcc; background: rgba(0,255,204,0.05); padding: 20px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div class="content-box">
+        <div style="text-align: right;"><a href="../electricity.html" style="color: #00ffcc; text-decoration: none;">RU</a> | EN</div>
+        <h1>Electricity and Input Lag</h1>
 
+        <h2>1. Power Grids: Then and Now</h2>
+        <p>Modern devices use <span style="color:#00ffcc">Switching Power Supplies</span> (SMPS). They dump high-frequency "noise" back into your outlets. Without proper grounding, this electrical noise leaks into your PC case and USB ports.</p>
+
+        <h2>2. High Polling Rate Paradox</h2>
+        <p>Modern mice running at <span style="color:#00ffcc">1000Hz - 8000Hz</span> are extremely sensitive to micro-fluctuations in the power grid that weren't noticeable 15 years ago.</p>
+
+        <h2>3. Data Distortion</h2>
+        <p>When the grid is "dirty," the mouse controller spends vital microseconds on error correction. You feel this as a loss of responsiveness.</p>
+
+        <h2>4. Why No Grounding Kills Your "Reg"</h2>
+        <p>Without grounding, your PC case can have a 110V potential. For a microchip, this is like trying to use super-accurate scales while someone is constantly shaking the table.</p>
+
+        <nav style="margin-top:40px;">
+            <a href="index.html" style="color:#00ffcc; margin-right:20px;">Home</a>
+            <a href="mystory.html" style="color:#00ffcc;">My Story</a>
+        </nav>
+    </div>
+</body>
+</html>
