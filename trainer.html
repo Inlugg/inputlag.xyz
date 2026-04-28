@@ -1,150 +1,141 @@
+Справедливо! Вкладка — это уже крайняя мера. Если на странице пусто, а шар при этом двигается, значит, JavaScript работает, но у тебя на сайте есть какой-то хитрый CSS, который либо делает текст прозрачным, либо выносит его за экран.
+
+Давай сделаем так: я упакую всё (стили, разметку и логику) в один блок, где каждый элемент имеет принудительные настройки, которые невозможно перебить внешними файлами.
+
+Я добавил таймеру background: #222, чтобы он был как отдельное табло. Если ты видишь черное поле игры, ты обязан увидеть и эту серую плашку с цифрами.
+
+HTML
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aim Test | Input Lag Lab</title>
+    <title>Aim Test</title>
     <style>
-        body {
-            background: #111; color: #fff;
-            font-family: sans-serif; text-align: center;
-            margin: 0; padding: 20px;
+        body { background: #111; color: #fff; font-family: Arial, sans-serif; text-align: center; }
+        
+        /* ГЛАВНЫЙ БЛОК СТАТИСТИКИ - СДЕЛАЛ ЕГО ЖЕЛЕЗНЫМ */
+        #status-panel {
+            background: #222 !important;
+            border: 2px solid #ff4655 !important;
+            display: inline-block !important;
+            padding: 15px 30px !important;
+            margin: 20px auto !important;
+            border-radius: 10px !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
         }
 
-        /* ПАНЕЛЬ С ТАЙМЕРОМ - ТЕПЕРЬ ОНА ОТДЕЛЬНО */
-        .dashboard {
-            background: #222;
-            padding: 20px;
-            border: 2px solid #ff4655;
-            display: inline-block;
-            margin-bottom: 10px;
-            border-radius: 10px;
+        .stat-text {
+            display: inline-block !important;
+            font-size: 36px !important;
+            font-weight: bold !important;
+            margin: 0 20px !important;
+            color: #fff !important;
+            visibility: visible !important;
         }
 
-        .stat-box {
-            display: inline-block;
-            margin: 0 30px;
-            font-size: 32px;
-            font-weight: bold;
+        #timer-val { color: #ff4655 !important; } /* Красный таймер */
+        #score-val { color: #00ffcc !important; } /* Бирюзовый счет */
+
+        #game-area {
+            width: 90vw; height: 500px; max-width: 1000px;
+            background: #000; margin: 0 auto; position: relative;
+            border: 3px solid #333; overflow: hidden; cursor: crosshair;
         }
 
-        #timer { color: #ff4655; } /* Таймер будет красным всегда */
-        #score { color: #00ffcc; }
-
-        #game-field {
-            width: 90vw; height: 500px;
-            max-width: 1200px;
-            background: #000;
-            margin: 0 auto;
-            position: relative;
-            border: 2px solid #333;
-            overflow: hidden;
-            cursor: crosshair;
+        #target-dot {
+            width: 50px; height: 50px; background: #33ff00;
+            border-radius: 50%; position: absolute; display: none;
+            box-shadow: 0 0 20px #33ff00;
         }
 
-        #target {
-            width: 50px; height: 50px;
-            background: #33ff00;
-            border-radius: 50%;
-            position: absolute;
-            display: none;
-            box-shadow: 0 0 15px #33ff00;
-        }
-
-        .btn {
-            padding: 15px 40px; background: #ff4655;
-            color: #fff; border: none; font-size: 20px;
-            cursor: pointer; font-weight: bold;
-            margin-top: 10px;
+        .main-btn {
+            padding: 20px 40px; background: #ff4655; color: #fff;
+            border: none; font-size: 20px; cursor: pointer; margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <h1>AIM TRACKING TEST</h1>
+    <h1>РАЗМИНКА ПЕРЕД ИГРОЙ</h1>
 
-    <div class="dashboard">
-        <div class="stat-box">ВРЕМЯ: <span id="timer">60</span>с</div>
-        <div class="stat-box">СЧЕТ: <span id="score">0</span></div>
+    <div id="status-panel">
+        <div class="stat-text">ВРЕМЯ: <span id="timer-val">60</span></div>
+        <div class="stat-text">СЧЕТ: <span id="score-val">0</span></div>
     </div>
 
-    <div id="game-field">
-        <div id="target"></div>
-        
-        <div id="overlay" style="padding-top: 200px;">
-            <h2 id="msg"></h2>
-            <button class="btn" onclick="startGame()">ИГРАТЬ (60 СЕК)</button>
+    <div id="game-area">
+        <div id="target-dot"></div>
+        <div id="menu" style="margin-top: 180px;">
+            <button class="main-btn" onclick="startTest()">НАЧАТЬ ТЕСТ (60 СЕК)</button>
         </div>
     </div>
 
     <script>
-        let timeLeft = 60;
+        let seconds = 60;
         let points = 0;
-        let timerId;
-        let isRunning = false;
+        let isPlaying = false;
+        let timerTick;
 
-        const timerEl = document.getElementById('timer');
-        const scoreEl = document.getElementById('score');
-        const target = document.getElementById('target');
-        const field = document.getElementById('game-field');
-        const overlay = document.getElementById('overlay');
-        const msg = document.getElementById('msg');
+        const timerDisplay = document.getElementById('timer-val');
+        const scoreDisplay = document.getElementById('score-val');
+        const dot = document.getElementById('target-dot');
+        const area = document.getElementById('game-area');
 
-        function startGame() {
-            timeLeft = 60;
+        function startTest() {
+            if(isPlaying) return;
+            
+            seconds = 60;
             points = 0;
-            isRunning = true;
+            isPlaying = true;
 
-            timerEl.innerText = timeLeft;
-            scoreEl.innerText = points;
+            timerDisplay.innerHTML = seconds;
+            scoreDisplay.innerHTML = points;
             
-            overlay.style.display = 'none';
-            target.style.display = 'block';
+            document.getElementById('menu').style.display = 'none';
+            dot.style.display = 'block';
             
-            move();
+            reposition();
 
-            clearInterval(timerId);
-            timerId = setInterval(() => {
-                timeLeft--;
-                timerEl.innerText = timeLeft;
-                
-                if (timeLeft <= 0) {
-                    stopGame();
+            clearInterval(timerTick);
+            timerTick = setInterval(() => {
+                seconds--;
+                timerDisplay.innerHTML = seconds;
+
+                if (seconds <= 0) {
+                    stopTest();
                 }
             }, 1000);
 
-            field.onmousemove = (e) => {
-                if (!isRunning) return;
-                const rect = field.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+            area.onmousemove = (e) => {
+                if (!isPlaying) return;
+                const r = area.getBoundingClientRect();
+                const mx = e.clientX - r.left;
+                const my = e.clientY - r.top;
+                const tx = parseInt(dot.style.left);
+                const ty = parseInt(dot.style.top);
                 
-                const tx = parseInt(target.style.left);
-                const ty = parseInt(target.style.top);
-                
-                if (x > tx && x < tx + 50 && y > ty && y < ty + 50) {
+                if (mx > tx && mx < tx + 50 && my > ty && my < ty + 50) {
                     points++;
-                    scoreEl.innerText = points;
-                    move();
+                    scoreDisplay.innerHTML = points;
+                    reposition();
                 }
             };
         }
 
-        function move() {
-            const maxX = field.clientWidth - 60;
-            const maxY = field.clientHeight - 60;
-            target.style.left = Math.random() * maxX + "px";
-            target.style.top = Math.random() * maxY + "px";
+        function reposition() {
+            dot.style.left = Math.random() * (area.clientWidth - 60) + "px";
+            dot.style.top = Math.random() * (area.clientHeight - 60) + "px";
         }
 
-        function stopGame() {
-            isRunning = false;
-            clearInterval(timerId);
-            target.style.display = 'none';
-            overlay.style.display = 'block';
-            msg.innerHTML = "КОНЕЦ!<br>ТВОЙ РЕЗУЛЬТАТ: " + points;
+        function stopTest() {
+            isPlaying = false;
+            clearInterval(timerTick);
+            dot.style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+            alert("Конец! Твой счет: " + points);
         }
     </script>
-
 </body>
 </html>
