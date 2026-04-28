@@ -7,82 +7,51 @@
     <style>
         body, html {
             margin: 0; padding: 0; min-height: 100%;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #1a1a1a; color: #ffffff;
             display: flex; flex-direction: column; align-items: center;
         }
 
         .background-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
-                        url('i1583076866325242.jpeg') no-repeat center center; 
-            background-size: cover; z-index: -1;
+            background: #111; z-index: -1;
         }
 
         .content-box {
-            margin: 20px auto; 
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(12px); 
-            padding: 30px; 
-            border-radius: 24px;
-            width: 95vw;          
-            max-width: 1400px;    
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            text-align: center;
-            box-sizing: border-box;
+            margin: 20px auto; background: #000;
+            padding: 20px; border-radius: 15px;
+            width: 95vw; max-width: 1200px;
+            border: 2px solid #00ffcc; text-align: center;
         }
-
-        h1 { color: #ff4655; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
 
         #game-field {
-            width: 100%; 
-            height: 550px; 
-            background: #050505;
-            border: 2px solid #00ffcc; 
-            position: relative; 
-            overflow: hidden; 
-            cursor: none;
-            border-radius: 12px;
+            width: 100%; height: 500px; background: #000;
+            position: relative; overflow: hidden; cursor: crosshair;
+            border: 1px solid #333; margin-top: 10px;
         }
 
-        /* ТАЙМЕР И ОЧКИ ВНУТРИ ПОЛЯ */
-        .game-ui {
-            position: absolute;
-            top: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            pointer-events: none; /* Чтобы не мешали мышке */
-            z-index: 50;
-            text-shadow: 0 0 10px rgba(0,0,0,1);
-        }
-
-        #ui-score { left: 30px; color: #00ffcc; }
-        #ui-timer { right: 30px; color: #ffffff; }
-        .time-warning { color: #ff4655 !important; }
-
-        #aim-dot {
-            width: 10px; height: 10px; background: #ffffff;
-            border-radius: 50%; position: absolute;
-            pointer-events: none; display: none; z-index: 10;
-            box-shadow: 0 0 10px #ffffff;
+        /* ТАЙМЕР - СДЕЛАЛ МАКСИМАЛЬНО ЗАМЕТНЫМ */
+        .ui-element {
+            position: absolute; top: 10px;
+            font-size: 32px; font-weight: 900;
+            color: #00ffcc; z-index: 9999;
+            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            pointer-events: none;
         }
 
         #target-ball {
-            width: 60px; height: 60px; 
-            background: #33ff00;
+            width: 50px; height: 50px; background: #33ff00;
             border-radius: 50%; position: absolute; display: none;
-            box-shadow: 0 0 30px rgba(51, 255, 0, 0.7);
+            box-shadow: 0 0 20px #33ff00;
         }
 
         .btn {
-            padding: 20px 60px; background: #ff4655; color: white;
-            border: none; border-radius: 8px; font-weight: bold;
-            cursor: pointer; text-transform: uppercase; font-size: 1.2em;
+            padding: 15px 40px; background: #ff4655; color: #fff;
+            border: none; cursor: pointer; font-size: 20px; font-weight: bold;
         }
 
-        nav { margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: left; }
-        nav a { color: #00ffcc; text-decoration: none; margin-right: 25px; font-weight: bold; }
+        nav { margin-top: 20px; text-align: center; }
+        nav a { color: #00ffcc; text-decoration: none; margin: 0 15px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -90,18 +59,17 @@
     <div class="background-overlay"></div>
 
     <main class="content-box">
-        <h1>Разминка Трекинга</h1>
-
+        <h1 style="color:#ff4655; margin:0;">AIM TEST</h1>
+        
         <div id="game-field">
-            <div id="ui-score" class="game-ui">Очки: 0</div>
-            <div id="ui-timer" class="game-ui">60с</div>
+            <div id="ui-score" class="ui-element" style="left: 20px;">SCORE: 0</div>
+            <div id="ui-timer" class="ui-element" style="right: 20px; color: #fff;">60s</div>
 
-            <div id="aim-dot"></div>
             <div id="target-ball"></div>
             
-            <div id="start-screen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100;">
-                <div id="final-msg" style="display:none; font-size: 24px; margin-bottom: 20px; color: #fff;"></div>
-                <button class="btn" onclick="startGame()">Начать (60 сек)</button>
+            <div id="start-screen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000;">
+                <h2 id="res-msg" style="display:none;"></h2>
+                <button class="btn" onclick="startGame()">START 60 SEC</button>
             </div>
         </div>
 
@@ -113,86 +81,73 @@
     </main>
 
     <script>
-        const dot = document.getElementById('aim-dot');
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let active = false;
+
         const ball = document.getElementById('target-ball');
         const field = document.getElementById('game-field');
         const scoreUI = document.getElementById('ui-score');
         const timerUI = document.getElementById('ui-timer');
         const startScreen = document.getElementById('start-screen');
-        const finalMsg = document.getElementById('final-msg');
-        
-        let score = 0;
-        let timeLeft = 60;
-        let timerInterval;
-        let gameActive = false;
-        const ballSize = 60;
+        const resMsg = document.getElementById('res-msg');
 
         function startGame() {
             score = 0;
             timeLeft = 60;
-            gameActive = true;
-            
-            scoreUI.innerText = "Очки: 0";
-            timerUI.innerText = "60с";
-            timerUI.classList.remove('time-warning');
+            active = true;
+
+            scoreUI.innerHTML = "SCORE: 0";
+            timerUI.innerHTML = "60s";
             
             startScreen.style.display = 'none';
-            finalMsg.style.display = 'none';
-            dot.style.display = 'block';
             ball.style.display = 'block';
             
             moveBall();
 
-            if (timerInterval) clearInterval(timerInterval);
+            // Запуск таймера
+            if(timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
-                timerUI.innerText = timeLeft + "с";
+                timerUI.innerHTML = timeLeft + "s";
                 
-                if (timeLeft <= 10) {
-                    timerUI.classList.add('time-warning');
-                }
-
                 if (timeLeft <= 0) {
                     endGame();
                 }
             }, 1000);
 
+            // Клик по полю (или наведение)
             field.onmousemove = (e) => {
-                if (!gameActive) return;
+                if (!active) return;
                 const rect = field.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                dot.style.left = (x - 5) + 'px';
-                dot.style.top = (y - 5) + 'px';
-                checkCollision(x, y);
+                
+                const bX = parseInt(ball.style.left);
+                const bY = parseInt(ball.style.top);
+                
+                if (x > bX && x < bX + 50 && y > bY && y < bY + 50) {
+                    score++;
+                    scoreUI.innerHTML = "SCORE: " + score;
+                    moveBall();
+                }
             };
         }
 
         function moveBall() {
-            if (!gameActive) return;
-            const maxX = field.clientWidth - ballSize - 10;
-            const maxY = field.clientHeight - ballSize - 10;
-            ball.style.left = Math.floor(Math.random() * maxX + 5) + 'px';
-            ball.style.top = Math.floor(Math.random() * maxY + 5) + 'px';
-        }
-
-        function checkCollision(x, y) {
-            const bX = parseInt(ball.style.left);
-            const bY = parseInt(ball.style.top);
-            if (x > bX && x < bX + ballSize && y > bY && y < bY + ballSize) {
-                score++;
-                scoreUI.innerText = "Очки: " + score;
-                moveBall();
-            }
+            const maxX = field.clientWidth - 60;
+            const maxY = field.clientHeight - 60;
+            ball.style.left = Math.random() * maxX + "px";
+            ball.style.top = Math.random() * maxY + "px";
         }
 
         function endGame() {
-            gameActive = false;
+            active = false;
             clearInterval(timerInterval);
-            dot.style.display = 'none';
             ball.style.display = 'none';
-            finalMsg.style.display = 'block';
-            finalMsg.innerHTML = "ФИНАЛ<br>Результат: " + score;
+            resMsg.style.display = 'block';
+            resMsg.innerHTML = "FINISH! SCORE: " + score;
             startScreen.style.display = 'block';
         }
     </script>
