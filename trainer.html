@@ -25,11 +25,8 @@
             backdrop-filter: blur(12px); 
             padding: 30px; 
             border-radius: 24px;
-            
-            /* СИЛОВОЕ РАСШИРЕНИЕ */
-            width: 95vw;          /* 95% от ширины всего окна браузера */
-            max-width: 1400px;    /* Максимальный предел, чтобы не ушло за края на 4К */
-            
+            width: 95vw;          
+            max-width: 1400px;    
             border: 1px solid rgba(0, 255, 204, 0.2);
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             text-align: center;
@@ -40,7 +37,7 @@
 
         #game-field {
             width: 100%; 
-            height: 550px; /* Оптимальная высота для широкого экрана */
+            height: 550px; 
             background: #050505;
             border: 2px solid #00ffcc; 
             position: relative; 
@@ -63,13 +60,25 @@
             box-shadow: 0 0 30px rgba(51, 255, 0, 0.7);
         }
 
-        #stats { margin-bottom: 15px; font-size: 1.6em; color: #00ffcc; font-weight: bold; }
+        #stats { 
+            margin-bottom: 15px; 
+            font-size: 1.6em; 
+            color: #00ffcc; 
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .timer-red { color: #ff4655; }
 
         .btn {
             padding: 20px 60px; background: #ff4655; color: white;
             border: none; border-radius: 8px; font-weight: bold;
             cursor: pointer; text-transform: uppercase; font-size: 1.2em;
+            transition: 0.2s;
         }
+        .btn:hover { background: #ff5f6d; transform: scale(1.05); }
 
         nav { margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: left; }
         nav a { color: #00ffcc; text-decoration: none; margin-right: 25px; font-weight: bold; }
@@ -81,13 +90,18 @@
 
     <main class="content-box">
         <h1>Разминка Трекинга</h1>
-        <div id="stats">Собрано целей: <span id="score">0</span></div>
+        
+        <div id="stats">
+            <div>Цели: <span id="score">0</span></div>
+            <div>Время: <span id="timer">60</span>с</div>
+        </div>
 
         <div id="game-field">
             <div id="aim-dot"></div>
             <div id="target-ball"></div>
-            <div id="start-screen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                <button class="btn" onclick="startGame()">Начать тест</button>
+            <div id="start-screen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100;">
+                <div id="final-msg" style="display:none; font-size: 1.5em; margin-bottom: 20px; color: #fff;"></div>
+                <button class="btn" onclick="startGame()">Начать тест (1 мин)</button>
             </div>
         </div>
 
@@ -103,31 +117,64 @@
         const ball = document.getElementById('target-ball');
         const field = document.getElementById('game-field');
         const scoreEl = document.getElementById('score');
+        const timerEl = document.getElementById('timer');
         const startScreen = document.getElementById('start-screen');
+        const finalMsg = document.getElementById('final-msg');
         
         let score = 0;
+        let timeLeft = 60;
+        let gameActive = false;
+        let timerInterval;
         const ballSize = 60;
 
         function startGame() {
+            // Сброс параметров
             score = 0;
+            timeLeft = 60;
+            gameActive = true;
+            
             scoreEl.textContent = score;
+            timerEl.textContent = timeLeft;
+            timerEl.classList.remove('timer-red');
+            
             startScreen.style.display = 'none';
             dot.style.display = 'block';
             ball.style.display = 'block';
+            
             moveBall();
 
+            // Таймер
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                
+                if (timeLeft <= 10) {
+                    timerEl.classList.add('timer-red');
+                }
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            // Управление мышью
             field.onmousemove = (e) => {
+                if (!gameActive) return;
+                
                 const rect = field.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+                
                 dot.style.left = (x - 5) + 'px';
                 dot.style.top = (y - 5) + 'px';
+                
                 checkCollision(x, y);
             };
         }
 
         function moveBall() {
-            // Теперь maxX будет учитывать новую огромную ширину поля автоматически
+            if (!gameActive) return;
             const maxX = field.clientWidth - (ballSize + 20);
             const maxY = field.clientHeight - (ballSize + 20);
             ball.style.left = (Math.random() * maxX + 10) + 'px';
@@ -142,6 +189,20 @@
                 scoreEl.textContent = score;
                 moveBall();
             }
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            dot.style.display = 'none';
+            ball.style.display = 'none';
+            
+            finalMsg.style.display = 'block';
+            finalMsg.innerHTML = `Тест окончен!<br>Ваш результат: <span style="color:#00ffcc">${score}</span>`;
+            
+            startScreen.style.display = 'block';
+            field.onmousemove = null;
         }
     </script>
 </body>
