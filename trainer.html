@@ -31,27 +31,30 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             text-align: center;
             box-sizing: border-box;
+            position: relative;
         }
 
-        h1 { color: #ff4655; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        h1 { color: #ff4655; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
 
-        /* СТАТИСТИКА */
-        .stats-container {
-            display: flex;
-            justify-content: center;
-            gap: 50px;
+        /* УПРОЩЕННЫЕ СТАТЫ */
+        .info-bar {
             margin-bottom: 20px;
-            font-size: 1.8em;
+            font-size: 24px;
             font-weight: bold;
-            color: #00ffcc;
+        }
+        
+        .stat-item {
+            display: inline-block;
+            margin: 0 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
         }
 
-        .timer-val { color: #ffffff; }
-        .timer-low { color: #ff4655; animation: blink 1s infinite; }
-
-        @keyframes blink {
-            50% { opacity: 0.5; }
-        }
+        #score { color: #00ffcc; }
+        #timer { color: #ffffff; }
+        .low-time { color: #ff4655 !important; }
 
         #game-field {
             width: 100%; 
@@ -68,7 +71,6 @@
             width: 10px; height: 10px; background: #ffffff;
             border-radius: 50%; position: absolute;
             pointer-events: none; display: none; z-index: 10;
-            box-shadow: 0 0 10px #ffffff;
         }
 
         #target-ball {
@@ -95,18 +97,18 @@
     <main class="content-box">
         <h1>Разминка Трекинга</h1>
         
-        <div class="stats-container">
-            <div>Очки: <span id="score">0</span></div>
-            <div>Время: <span id="timer" class="timer-val">60</span>с</div>
+        <div class="info-bar">
+            <div class="stat-item">Очки: <span id="score">0</span></div>
+            <div class="stat-item">Осталось: <span id="timer">60</span> сек</div>
         </div>
 
         <div id="game-field">
             <div id="aim-dot"></div>
             <div id="target-ball"></div>
             
-            <div id="start-screen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; width: 100%;">
-                <div id="final-msg" style="display:none; font-size: 1.8em; margin-bottom: 20px; color: #fff;"></div>
-                <button class="btn" id="start-btn" onclick="startGame()">Начать тест (60 сек)</button>
+            <div id="start-screen" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100;">
+                <div id="final-msg" style="display:none; font-size: 24px; margin-bottom: 20px; color: #fff;"></div>
+                <button class="btn" id="start-btn" onclick="startGame()">Запустить (60 сек)</button>
             </div>
         </div>
 
@@ -134,13 +136,14 @@
         const ballSize = 60;
 
         function startGame() {
+            // Инициализация
             score = 0;
             timeLeft = 60;
             gameActive = true;
             
-            scoreEl.textContent = score;
-            timerEl.textContent = timeLeft;
-            timerEl.className = 'timer-val';
+            scoreEl.innerText = score;
+            timerEl.innerText = timeLeft;
+            timerEl.classList.remove('low-time');
             
             startScreen.style.display = 'none';
             finalMsg.style.display = 'none';
@@ -149,16 +152,14 @@
             
             moveBall();
 
-            // Чистим старый таймер если был
-            clearInterval(timerInterval);
-            
-            // Запуск нового таймера
+            // Таймер
+            if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft--;
-                timerEl.textContent = timeLeft;
+                timerEl.innerText = timeLeft;
                 
                 if (timeLeft <= 10) {
-                    timerEl.className = 'timer-low';
+                    timerEl.classList.add('low-time');
                 }
 
                 if (timeLeft <= 0) {
@@ -166,7 +167,7 @@
                 }
             }, 1000);
 
-            // Обработка мыши
+            // Мышь
             field.onmousemove = (e) => {
                 if (!gameActive) return;
                 const rect = field.getBoundingClientRect();
@@ -194,7 +195,7 @@
             
             if (x > bX && x < bX + ballSize && y > bY && y < bY + ballSize) {
                 score++;
-                scoreEl.textContent = score;
+                scoreEl.innerText = score;
                 moveBall();
             }
         }
@@ -207,10 +208,9 @@
             ball.style.display = 'none';
             
             finalMsg.style.display = 'block';
-            finalMsg.innerHTML = `Тест завершен!<br>Твой счет: <span style="color:#00ffcc">${score}</span>`;
-            startBtn.textContent = "Попробовать снова";
+            finalMsg.innerHTML = "Время вышло!<br>Твой результат: " + score;
+            startBtn.innerText = "Повторить тест";
             startScreen.style.display = 'block';
-            field.onmousemove = null;
         }
     </script>
 </body>
