@@ -2,20 +2,21 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Aim Test</title>
+    <title>Ultimate Aim Lab</title>
     <style>
-        body { background: #111; color: #fff; font-family: Arial, sans-serif; text-align: center; }
+        body { background: #111; color: #fff; font-family: Arial, sans-serif; text-align: center; padding-bottom: 50px; }
         
-        #status-panel {
+        .game-container {
+            margin-bottom: 80px; /* Отступ между играми */
+        }
+
+        #status-panel, #status-panel-2 {
             background: #222 !important;
             border: 2px solid #ff4655 !important;
             display: inline-block !important;
             padding: 15px 30px !important;
             margin: 20px auto !important;
             border-radius: 10px !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            position: relative !important;
         }
 
         .stat-text {
@@ -26,125 +27,185 @@
             color: #fff !important;
         }
 
-        #timer-val { color: #ff4655 !important; }
-        #score-val { color: #00ffcc !important; }
+        .timer-val { color: #ff4655 !important; }
+        .score-val { color: #00ffcc !important; }
 
-        #game-area {
+        .game-area {
             width: 90vw; height: 500px; max-width: 1000px;
             background: #000; margin: 0 auto; position: relative;
-            border: 3px solid #333; overflow: hidden; cursor: none; /* Скрыли обычный курсор */
+            border: 3px solid #333; overflow: hidden; cursor: none;
+            border-radius: 15px;
         }
 
-        /* ИСПРАВЛЕННЫЙ ПРИЦЕЛ */
-        #aim-cursor {
+        /* ПРИЦЕЛ */
+        .aim-cursor {
             width: 10px; height: 10px; 
-            background: #ffffff !important; /* Всегда белый */
+            background: #ffffff !important;
             border-radius: 50%; position: absolute;
             pointer-events: none; display: none; z-index: 999;
             box-shadow: 0 0 8px #ffffff;
-            /* Защита от инверсии цветов расширениями */
             filter: none !important; 
             mix-blend-mode: normal !important;
         }
 
-        #target-dot {
+        /* ЦЕЛИ */
+        .target {
             width: 50px; height: 50px; background: #33ff00;
             border-radius: 50%; position: absolute; display: none;
             box-shadow: 0 0 20px #33ff00;
+            cursor: none;
+        }
+
+        /* ВТОРАЯ ИГРА - ЦЕЛИ ДРУГОГО ЦВЕТА ДЛЯ РАЗНООБРАЗИЯ */
+        .target-2 {
+            width: 40px; height: 40px; background: #ff00ff;
+            border-radius: 50%; position: absolute; display: none;
+            box-shadow: 0 0 15px #ff00ff;
         }
 
         .main-btn {
             padding: 20px 40px; background: #ff4655; color: #fff;
-            border: none; font-size: 20px; cursor: pointer; margin-top: 20px;
+            border: none; font-size: 20px; cursor: pointer; margin-top: 180px;
+            border-radius: 8px; font-weight: bold;
         }
+        
+        h1 { color: #ff4655; margin-top: 40px; text-transform: uppercase; }
+        .desc { color: #888; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <h1>РАЗМИНКА ПЕРЕД ИГРОЙ</h1>
+    <div class="game-container">
+        <h1>1. TRACKING TRAINER</h1>
+        <p class="desc">Удерживай прицел на шаре. Тренирует плавность мышки.</p>
+        <div id="status-panel">
+            <div class="stat-text">ВРЕМЯ: <span id="timer-val" class="timer-val">60</span></div>
+            <div class="stat-text">СЧЕТ: <span id="score-val" class="score-val">0</span></div>
+        </div>
 
-    <div id="status-panel">
-        <div class="stat-text">ВРЕМЯ: <span id="timer-val">60</span></div>
-        <div class="stat-text">СЧЕТ: <span id="score-val">0</span></div>
+        <div id="game-area-1" class="game-area">
+            <div id="aim-cursor-1" class="aim-cursor"></div>
+            <div id="target-dot" class="target"></div>
+            <button id="btn-1" class="main-btn" onclick="startTracking()">НАЧАТЬ ТРЕКИНГ</button>
+        </div>
     </div>
 
-    <div id="game-area">
-        <div id="aim-cursor"></div> <div id="target-dot"></div>
-        <div id="menu" style="margin-top: 180px;">
-            <button class="main-btn" onclick="startTest()">НАЧАТЬ ТЕСТ (60 СЕК)</button>
+    <hr style="border: 1px solid #333; width: 80%;">
+
+    <div class="game-container">
+        <h1>2. GRIDSHOT REFLEX</h1>
+        <p class="desc">Кликай по мишеням максимально быстро. Тренирует скорость реакции.</p>
+        <div id="status-panel-2">
+            <div class="stat-text">ВРЕМЯ: <span id="timer-val-2" class="timer-val">60</span></div>
+            <div class="stat-text">СЧЕТ: <span id="score-val-2" class="score-val">0</span></div>
+        </div>
+
+        <div id="game-area-2" class="game-area">
+            <div id="aim-cursor-2" class="aim-cursor"></div>
+            <div id="t1" class="target target-2" onclick="hitTarget(this)"></div>
+            <div id="t2" class="target target-2" onclick="hitTarget(this)"></div>
+            <div id="t3" class="target target-2" onclick="hitTarget(this)"></div>
+            
+            <button id="btn-2" class="main-btn" onclick="startGridshot()">НАЧАТЬ ГРИДШОТ</button>
         </div>
     </div>
 
     <script>
-        let seconds = 60;
-        let points = 0;
-        let isPlaying = false;
-        let timerTick;
+        // --- ЛОГИКА ПЕРВОЙ ИГРЫ (ТРЕКИНГ) ---
+        let sec1 = 60, pts1 = 0, playing1 = false, tick1;
+        const area1 = document.getElementById('game-area-1');
+        const curs1 = document.getElementById('aim-cursor-1');
+        const dot1 = document.getElementById('target-dot');
 
-        const timerDisplay = document.getElementById('timer-val');
-        const scoreDisplay = document.getElementById('score-val');
-        const dot = document.getElementById('target-dot');
-        const cursor = document.getElementById('aim-cursor');
-        const area = document.getElementById('game-area');
-
-        function startTest() {
-            if(isPlaying) return;
-            
-            seconds = 60;
-            points = 0;
-            isPlaying = true;
-
-            timerDisplay.innerHTML = seconds;
-            scoreDisplay.innerHTML = points;
-            
-            document.getElementById('menu').style.display = 'none';
-            dot.style.display = 'block';
-            cursor.style.display = 'block';
-            
-            reposition();
-
-            clearInterval(timerTick);
-            timerTick = setInterval(() => {
-                seconds--;
-                timerDisplay.innerHTML = seconds;
-                if (seconds <= 0) stopTest();
+        function startTracking() {
+            if(playing1) return;
+            sec1 = 60; pts1 = 0; playing1 = true;
+            document.getElementById('score-val').innerHTML = pts1;
+            document.getElementById('btn-1').style.display = 'none';
+            dot1.style.display = 'block';
+            curs1.style.display = 'block';
+            moveDot();
+            tick1 = setInterval(() => {
+                sec1--;
+                document.getElementById('timer-val').innerHTML = sec1;
+                if(sec1 <= 0) stopTracking();
             }, 1000);
-
-            area.onmousemove = (e) => {
-                const r = area.getBoundingClientRect();
-                const mx = e.clientX - r.left;
-                const my = e.clientY - r.top;
-                
-                // Двигаем прицел за мышкой
-                cursor.style.left = (mx - 5) + 'px';
-                cursor.style.top = (my - 5) + 'px';
-
-                if (!isPlaying) return;
-                
-                const tx = parseInt(dot.style.left);
-                const ty = parseInt(dot.style.top);
-                
-                if (mx > tx && mx < tx + 50 && my > ty && my < ty + 50) {
-                    points++;
-                    scoreDisplay.innerHTML = points;
-                    reposition();
-                }
-            };
         }
 
-        function reposition() {
-            dot.style.left = Math.random() * (area.clientWidth - 60) + "px";
-            dot.style.top = Math.random() * (area.clientHeight - 60) + "px";
+        function moveDot() {
+            dot1.style.left = Math.random() * (area1.clientWidth - 60) + "px";
+            dot1.style.top = Math.random() * (area1.clientHeight - 60) + "px";
         }
 
-        function stopTest() {
-            isPlaying = false;
-            clearInterval(timerTick);
-            dot.style.display = 'none';
-            cursor.style.display = 'none';
-            document.getElementById('menu').style.display = 'block';
-            alert("Конец! Твой счет: " + points);
+        function stopTracking() {
+            playing1 = false; clearInterval(tick1);
+            dot1.style.display = 'none'; curs1.style.display = 'none';
+            document.getElementById('btn-1').style.display = 'block';
+            alert("Tracking Score: " + pts1);
         }
+
+        area1.onmousemove = (e) => {
+            const r = area1.getBoundingClientRect();
+            const mx = e.clientX - r.left; const my = e.clientY - r.top;
+            curs1.style.left = (mx - 5) + 'px'; curs1.style.top = (my - 5) + 'px';
+            if(!playing1) return;
+            const tx = parseInt(dot1.style.left); const ty = parseInt(dot1.style.top);
+            if (mx > tx && mx < tx + 50 && my > ty && my < ty + 50) {
+                pts1++; document.getElementById('score-val').innerHTML = pts1;
+                moveDot();
+            }
+        };
+
+        // --- ЛОГИКА ВТОРОЙ ИГРЫ (GRIDSHOT) ---
+        let sec2 = 60, pts2 = 0, playing2 = false, tick2;
+        const area2 = document.getElementById('game-area-2');
+        const curs2 = document.getElementById('aim-cursor-2');
+        const targets = [document.getElementById('t1'), document.getElementById('t2'), document.getElementById('t3')];
+
+        function startGridshot() {
+            if(playing2) return;
+            sec2 = 60; pts2 = 0; playing2 = true;
+            document.getElementById('score-val-2').innerHTML = pts2;
+            document.getElementById('btn-2').style.display = 'none';
+            curs2.style.display = 'block';
+            targets.forEach(t => { t.style.display = 'block'; moveTarget(t); });
+            tick2 = setInterval(() => {
+                sec2--;
+                document.getElementById('timer-val-2').innerHTML = sec2;
+                if(sec2 <= 0) stopGridshot();
+            }, 1000);
+        }
+
+        function moveTarget(t) {
+            t.style.left = Math.random() * (area2.clientWidth - 50) + "px";
+            t.style.top = Math.random() * (area2.clientHeight - 50) + "px";
+        }
+
+        function hitTarget(t) {
+            if(!playing2) return;
+            pts2++;
+            document.getElementById('score-val-2').innerHTML = pts2;
+            moveTarget(t);
+        }
+
+        function stopGridshot() {
+            playing2 = false; clearInterval(tick2);
+            targets.forEach(t => t.style.display = 'none');
+            curs2.style.display = 'none';
+            document.getElementById('btn-2').style.display = 'block';
+            alert("Gridshot Score: " + pts2);
+        }
+
+        area2.onmousemove = (e) => {
+            const r = area2.getBoundingClientRect();
+            curs2.style.left = (e.clientX - r.left - 5) + 'px';
+            curs2.style.top = (e.clientY - r.top - 5) + 'px';
+        };
+        
+        // Для второй игры клик по полю
+        area2.onclick = () => {
+            // Если нужно считать промахи, можно добавить логику тут
+        };
     </script>
 </body>
 </html>
