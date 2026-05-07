@@ -4,170 +4,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Input Lag Lab: Тесты, Гайды и Оптимизация системы</title>
+    <title>Input Lag: Тесты, Гайды и Оптимизация системы</title>
     <meta name="description" content="Личный опыт борьбы с инпут лагом: от заземления и просадок напряжения до настройки периферии. Лаборатория inputlag.xyz.">
     <meta name="keywords" content="инпут лаг, input lag, заземление пк, электрический инпут лаг, 180 вольт в розетке, сенсор мыши плавает, valorant оптимизация, электросеть для геймера">
     
     <link rel="canonical" href="https://inputlag.xyz/index.html">
 
-    <meta property="og:title" content="Input Lag Lab: Исследование задержки ввода">
+    <meta property="og:title" content="Input Lag: Исследование задержки ввода">
     <meta property="og:description" content="Как электросеть и заземление влияют на твой аим. Личный опыт и технические тесты.">
     <meta property="og:url" content="https://inputlag.xyz/">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="https://inputlag.xyz/14282.jpg">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "InputLag XYZ",
+      "url": "https://inputlag.xyz/",
+      "description": "Личный опыт борьбы с инпут лагом и оптимизация системы"
+    }
+    </script>
 
     <style>
-        body, html {
+        :root {
+            --bg-color: #0b0d14;
+            --card-bg: #161a29;
+            --accent: #00d4ff; 
+            --text: #ffffff;
+            --muted: #8b949e;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
             margin: 0;
-            padding: 0;
-            min-height: 100%;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #ffffff;
+            line-height: 1.6;
+            /* Улучшение отрисовки шрифтов */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        header {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, #161a29 0%, #0b0d14 100%);
+            border-bottom: 1px solid #2d3250;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin: 0;
+            color: var(--accent);
+            text-transform: lowercase;
+        }
+
+        .logo span {
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #2d3250;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none; /* Чтобы вся карточка не подчеркивалась как ссылка */
+            color: inherit;
         }
 
-        .background-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .card:hover {
+            transform: scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .card-img {
             width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), 
-                        url('i1583076866325242.jpeg') no-repeat center center; 
-            background-size: cover;
-            z-index: -1;
+            height: 220px;
+            background: #252a41; 
+            object-fit: cover;
+            display: block;
         }
 
-        @media (min-width: 1024px) {
-            .background-overlay { background-attachment: fixed; }
-        }
-
-        .content-box {
-            margin: 60px 20px;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 800px;
-            width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-
-        h1 {
-            color: #ff4655;
-            font-size: clamp(1.8em, 5vw, 2.8em);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        h2 {
-            color: #00ffcc;
-            margin-top: 35px;
-            margin-bottom: 15px;
-            font-size: 1.6em;
-        }
-
-        p {
-            line-height: 1.7;
-            font-size: 1.15em;
-            color: #e0e0e0;
-            margin-bottom: 15px;
-        }
-
-        ul {
-            padding-left: 20px;
-            margin-bottom: 20px;
-        }
-
-        li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-            color: #f0f0f0;
-            font-size: 1.1em;
-        }
-
-        .highlight {
-            color: #00ffcc;
-            font-weight: 600;
-        }
-
-        nav {
-            margin-top: 40px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 25px;
+        .card-body {
+            padding: 25px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
-        nav a {
-            color: #00ffcc;
-            text-decoration: none;
+        .category {
+            color: var(--accent);
+            font-size: 0.75rem;
             font-weight: bold;
-            transition: 0.3s ease;
-            font-size: 1.1em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
         }
 
-        nav a:hover {
-            color: #ff4655;
-            text-shadow: 0 0 8px rgba(255, 70, 85, 0.5);
+        .card-title {
+            font-size: 1.4rem;
+            margin: 0 0 12px 0;
+            line-height: 1.2;
         }
 
-        @media (max-width: 600px) {
-            .content-box { padding: 25px; margin: 30px 15px; }
-            h2 { font-size: 1.3em; }
+        .card-desc {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            flex-grow: 1;
         }
-</style>
+
+        .btn {
+            align-self: flex-start;
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: #000;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+    </style>
 </head>
-<body> <div class="background-overlay"></div>
+<body>
 
-    <main class="content-box">
-        <div style="text-align: right; margin-bottom: 10px;">
-            <span style="color: #fff; font-weight: bold;">RU</span> | 
-            <a href="en/index.html" style="color: #00ffcc; text-decoration: none;">EN</a>
-        </div>
-        <h1>Input Lag Lab</h1>
+<header>
+    <h1 class="logo">Input<span>Lag</span></h1>
+    <p style="color: var(--muted)">Технический взгляд на игровую периферию</p>
+</header>
+
+<main class="container">
+    <div class="news-grid">
         
-        <p>Привет. Этот проект посвящен исследованию и устранению влияния <span class="highlight">электрической составляющей</span> на input lag в соревновательных дисциплинах.</p>
+        <article class="card">
+            <img src="mouse.jpg" class="card-img" alt="Игровые мыши: технические характеристики и тесты" loading="lazy">
+            <div class="card-body">
+                <span class="category">Обзор</span>
+                <h2 class="card-title">Игровые Мыши</h2>
+                <p class="card-desc">Технические спеки новинок + моё мнение о том, стоит ли это брать для серьезной игры.</p>
+                <a href="#" class="btn">Читать новости</a>
+            </div>
+        </article>
 
-        <h2>Что такое Input Lag на самом деле?</h2>
-        <p>Если максимально просто: <strong>Input Lag (задержка ввода)</strong> — это время, которое требуется системе, чтобы превратить твое физическое действие в видимый результат на экране. Многие путают это с сетевым пингом, но это разные вещи. Пинг — это задержка связи с сервером, а инпут лаг — это задержка внутри твоего рабочего места.</p>
+        <article class="card">
+            <img src="14282.jpg" class="card-img" alt="Влияние электрики и заземления на Input Lag" loading="lazy">
+            <div class="card-body">
+                <span class="category">Технологии</span>
+                <h2 class="card-title">Электрика и Input Lag</h2>
+                <p class="card-desc">Как новая проводка влияет на стабильность курсора. Личный опыт.</p>
+                <a href="electric-lag.html" class="btn">Узнать больше</a>
+            </div>
+        </article>
 
-        <h2>Цепочка, где теряются миллисекунды</h2>
-        <p>Задержка не возникает в одном месте, она суммируется на каждом этапе:</p>
-        <ul>
-            <li><span class="highlight">Периферия:</span> Как быстро контроллер мыши обработал нажатие.</li>
-            <li><span class="highlight">Шина USB и ПК:</span> Скорость прохождения сигнала через материнскую плату.</li>
-            <li><span class="highlight">Система (Windows):</span> Время на обработку кадра в очереди рендеринга.</li>
-            <li><span class="highlight">Монитор:</span> Скорость отображения обновленного пикселя матрицей.</li>
-        </ul>
+    </div>
+</main>
 
-        <h2>Почему мы за этим охотимся?</h2>
-        <p>В соревновательных шутерах, таких как <span class="highlight">Valorant или CS</span>, борьба идет за миллисекунды. Высокий инпут лаг создает ощущение, что прицел «плавает», он как будто привязан на резинке и всегда немного отстает от твоей руки.</p>
-        
-        <p>Когда задержка минимальна, ты получаешь чувство прямого контакта: прицел становится резким, а выстрелы регистрируются мгновенно.</p>
-
-        <p><strong>Важно:</strong> На этом сайте мы рассматриваем не только настройки Windows, но и то, как на эту задержку влияют фундаментальные вещи: качество электросети, наводки и отсутствие заземления.</p>
-
-        <p style="border-left: 4px solid #ff4655; padding-left: 15px; color: #888; margin-top: 30px;">
-            Сайт в стадии наполнения. Скоро здесь появятся детальные отчеты.
-            <p>
-            Сайт создан в ознакомительных целях. В случае возникновения вопросов пишите мне на почту: shdwd29@gmail.com
-        </p>
-
-        <nav>
-            <a href="index.html">Главная</a>
-            <a href="electricity.html">Электросеть</a>
-            <a href="mystory.html">Моя история</a>
-            <a href="mousenews.html">mousenews</a>
-            <a href="trainer.html">Aim Training</a>
-        </nav>
-    </main>
+<footer style="text-align: center; padding: 40px; color: var(--muted); font-size: 0.8rem;">
+    &copy; 2026 inputlag.xyz
+</footer>
 
 </body>
 </html>
