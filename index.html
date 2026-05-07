@@ -3,30 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Input Lag: Тесты, Гайды и Оптимизация системы</title>
-    <meta name="description" content="Личный опыт борьбы с инпут лагом: от заземления и просадок напряжения до настройки периферии. Лаборатория inputlag.xyz.">
-    <meta name="keywords" content="инпут лаг, input lag, заземление пк, электрический инпут лаг, 180 вольт в розетке, сенсор мыши плавает, valorant оптимизация, электросеть для геймера">
     
-    <link rel="canonical" href="https://inputlag.xyz/index.html">
-
-    <meta property="og:title" content="Input Lag: Исследование задержки ввода">
-    <meta property="og:description" content="Как электросеть и заземление влияют на твой аим. Личный опыт и технические тесты.">
-    <meta property="og:url" content="https://inputlag.xyz/">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://inputlag.xyz/14282.jpg">
-    <meta name="twitter:card" content="summary_large_image">
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "InputLag XYZ",
-      "url": "https://inputlag.xyz/",
-      "description": "Личный опыт борьбы с инпут лагом и оптимизация системы"
-    }
-    </script>
-
     <style>
         :root {
             --bg-color: #0b0d14;
@@ -37,13 +15,11 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text);
             margin: 0;
-            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
         header {
@@ -53,39 +29,26 @@
             border-bottom: 1px solid #2d3250;
         }
 
-        .logo {
-            font-size: 3rem;
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin: 0;
-            color: var(--accent);
-            text-transform: lowercase;
-        }
-
-        .logo span {
-            color: #fff;
-        }
+        .logo { font-size: 3rem; font-weight: 900; color: var(--accent); text-transform: lowercase; margin: 0; }
+        .logo span { color: #fff; }
 
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 40px auto;
             padding: 0 20px;
         }
 
+        /* Настройка сетки */
         .news-grid {
             display: grid;
-            /* Фиксируем 4 колонки для десктопа */
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr); /* 3 колонки в ряд */
+            gap: 25px;
         }
 
-        /* Адаптив: 2 колонки на планшетах, 1 на телефонах */
-        @media (max-width: 1024px) {
-            .news-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 650px) {
-            .news-grid { grid-template-columns: 1fr; }
-            .logo { font-size: 2.2rem; }
+        /* Делаем 4-ю карточку с нового ряда */
+        .card:nth-child(4) {
+            grid-column: 2; /* Ставим её во вторую колонку (по центру) */
+            margin-top: 10px;
         }
 
         .card {
@@ -98,67 +61,37 @@
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none;
             color: inherit;
-            height: 100%;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
 
-        .card-img {
-            width: 100%;
-            height: 180px;
-            background: #252a41; 
-            object-fit: cover;
-            display: block;
-        }
+        .card-img { width: 100%; height: 200px; object-fit: cover; display: block; }
 
-        .card-body {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
+        .card-body { padding: 25px; display: flex; flex-direction: column; flex-grow: 1; }
 
-        .category {
-            color: var(--accent);
-            font-size: 0.7rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            margin: 0 0 12px 0;
-            line-height: 1.2;
-        }
-
-        .card-desc {
-            color: var(--muted);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
+        .category { color: var(--accent); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        .card-title { font-size: 1.4rem; margin: 0 0 12px 0; }
+        .card-desc { color: var(--muted); font-size: 0.95rem; margin-bottom: 20px; flex-grow: 1; }
 
         .btn {
             align-self: flex-start;
-            display: inline-block;
-            padding: 10px 20px;
+            padding: 12px 24px;
             background: var(--accent);
             color: #000;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.85rem;
-            transition: 0.2s;
         }
 
-        .btn:hover {
-            filter: brightness(1.1);
+        /* Адаптив для мобилок */
+        @media (max-width: 900px) {
+            .news-grid { grid-template-columns: repeat(2, 1fr); }
+            .card:nth-child(4) { grid-column: auto; }
+        }
+
+        @media (max-width: 600px) {
+            .news-grid { grid-template-columns: 1fr; }
+            .card:nth-child(4) { grid-column: auto; }
         }
     </style>
 </head>
@@ -173,7 +106,7 @@
     <div class="news-grid">
         
         <article class="card">
-            <img src="mouse.jpg" class="card-img" alt="Игровые мыши: технические характеристики и тесты">
+            <img src="mouse.jpg" class="card-img" alt="Мыши">
             <div class="card-body">
                 <span class="category">Обзор</span>
                 <h2 class="card-title">Игровые Мыши</h2>
@@ -183,7 +116,7 @@
         </article>
 
         <article class="card">
-            <img src="14282.jpg" class="card-img" alt="Влияние электрики и заземления на Input Lag" loading="lazy">
+            <img src="14282.jpg" class="card-img" alt="Электрика">
             <div class="card-body">
                 <span class="category">Технологии</span>
                 <h2 class="card-title">Электрика и Input Lag</h2>
@@ -193,7 +126,7 @@
         </article>
 
         <article class="card">
-            <img src="mystory.jpg" class="card-img" alt="Моя История" loading="lazy">
+            <img src="mystory.jpg" class="card-img" alt="История">
             <div class="card-body">
                 <span class="category">Реальность</span>
                 <h2 class="card-title">Моя История</h2>
@@ -203,7 +136,7 @@
         </article>
 
         <article class="card">
-            <img src="aimtrainer.png" class="card-img" alt="Тренировка аима" loading="lazy">
+            <img src="aimtrainer.png" class="card-img" alt="Тренировка">
             <div class="card-body">
                 <span class="category">Разминка</span>
                 <h2 class="card-title">Тренировка</h2>
@@ -217,9 +150,6 @@
 
 <footer style="text-align: center; padding: 40px; color: var(--muted); font-size: 0.8rem;">
     <div>&copy; 2026 inputlag.xyz</div>
-    <div style="margin-top: 10px;">
-        Для связи: <a href="mailto:shdwd29@gmail.com" style="color: var(--accent); text-decoration: none;">shdwd29@gmail.com</a>
-    </div>
 </footer>
 
 </body>
