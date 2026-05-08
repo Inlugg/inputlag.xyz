@@ -1,10 +1,13 @@
+Я обновил код страницы «Моя история». Добавил блок про Logitech G PRO 2 и Xtrfy с твоими наблюдениями о беспроводном режиме и удалил переключатель языков (EN) сверху, оставив только заголовок навигации.
+
+HTML
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Моя история: Immortal 3 и борьба с 180V | Input Lag</title>
-    <meta name="description" content="Личный опыт: как апгрейд БП на MSI MAG A750GL выявил проблемы старой проводки и как это влияет на сенсоры мышек Razer, Pulsar и Logitech.">
+    <meta name="description" content="Личный опыт: как апгрейд БП на MSI MAG A750GL выявил проблемы старой проводки и как это влияет на сенсоры мышек Razer, Pulsar, Logitech и Xtrfy.">
     
     <link rel="canonical" href="https://inputlag.xyz/mystory.html">
 
@@ -36,7 +39,7 @@
         /* Верхняя навигация */
         .top-nav {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             margin-bottom: 30px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -92,10 +95,6 @@
             border-radius: 16px; margin-bottom: 20px; background: rgba(0, 255, 204, 0.03);
         }
 
-        .lang-switch { font-size: 0.9em; }
-        .lang-switch a { color: #00ffcc; text-decoration: none; transition: 0.3s; }
-        .lang-switch a:hover { color: #ff4655; }
-
         @media (max-width: 600px) {
             .content-box { padding: 25px; margin-top: 20px; }
             h1 { font-size: 1.8em; }
@@ -110,10 +109,6 @@
     <main class="content-box">
         <nav class="top-nav">
             <a href="index.html" class="back-link">← Вернуться на Главную</a>
-            <div class="lang-switch">
-                <span style="color: #fff; font-weight: bold;">RU</span> | 
-                <a href="en/mystory.html">EN</a>
-            </div>
         </nav>
 
         <h1>Моя История</h1>
@@ -165,6 +160,10 @@
 
             <div class="mouse-card">
                 <span class="highlight">RAWM ER21PRO:</span> Худший результат. Сенсор срывало хаотично. Мышь пришлось сдать по гарантии, так как играть было невозможно. С плохой электрикой категорически не советую.
+            </div>
+
+            <div class="mouse-card">
+                <span class="highlight">Logitech G PRO 2 / Xtrfy M8:</span> На этих моделях эффект «плавающего» сенсора менее выражен. Лучше всего они ведут себя на **беспроводном подключении**, где нет прямой физической связи с зашумленными USB-портами. Тем не менее, временами нестабильность сенсора все равно проявляется, хоть и не так критично.
             </div>
 
             <div class="mouse-card">
