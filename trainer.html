@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Valorant Aim Trainer: Polling Rate Monitor</title>
+    <title>8K Hz Ultra Aim Trainer</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; color: #00ff00; font-family: 'Segoe UI', sans-serif; }
         canvas { display: block; cursor: none; }
@@ -10,7 +10,8 @@
             position: absolute; top: 20px; left: 20px; 
             background: rgba(0,0,0,0.95); padding: 20px; 
             border: 1px solid #ff4655; pointer-events: auto; 
-            min-width: 220px; box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
+            width: 220px; box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
+            z-index: 10;
         }
 
         .btn-reset {
@@ -30,7 +31,7 @@
 
         #results-screen {
             display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(10, 10, 10, 0.95); padding: 40px; border: 2px solid #ff4655;
+            background: rgba(10, 10, 10, 0.98); padding: 40px; border: 2px solid #ff4655;
             text-align: center; z-index: 100; min-width: 320px;
         }
         .res-val { color: #ff4655; font-size: 24px; font-weight: bold; }
@@ -43,8 +44,8 @@
         <div class="stat-row"><span class="stat-label">Body Hits:</span> <span id="res-body" class="res-val">0</span></div>
         <div class="stat-row"><span class="stat-label">Misses:</span> <span id="res-miss" class="res-val" style="color: #888;">0</span></div>
         <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
-        <div class="stat-row"><span class="stat-label">Avg Polling Rate:</span> <span id="res-hz" class="res-val" style="color: #00ff00;">0 Hz</span></div>
-        <div class="stat-row"><span class="stat-label">Стабильность:</span> <span id="res-hz-status" class="res-val" style="font-size: 16px;">ОК</span></div>
+        <div class="stat-row"><span class="stat-label">AVG Polling Rate:</span> <span id="res-hz" class="res-val" style="color: #00ff00;">0 Hz</span></div>
+        <div class="stat-row"><span class="stat-label">Стабильность:</span> <span id="res-hz-status" class="res-val" style="font-size: 16px;">--</span></div>
         <br>
         <button class="btn-reset" onclick="closeResults()">Продолжить</button>
     </div>
@@ -80,15 +81,15 @@
     let timeLeft = 60, lastFpsUpdate = 0, countdownInterval;
     let target = { x: 0, y: 0, hp: 100 };
 
-    // Переменные для герцовки мыши
-    let lastMouseMoveTime = performance.now();
-    let mouseIntervals = [];
+    // Система мониторинга герцовки (Ultra High Rate)
+    let lastEventTime = performance.now();
     let hzDrops = 0;
     let totalHzSamples = 0;
     let sumHz = 0;
 
     function respawn() {
-        const safeMarginLeft = 300;
+        // Учет левой колонки (300px запаса)
+        const safeMarginLeft = 320; 
         target.x = Math.random() * (window.innerWidth - safeMarginLeft - 100) + safeMarginLeft;
         target.y = Math.random() * (window.innerHeight - 300) + 150;
         target.hp = 100;
@@ -99,10 +100,7 @@
         isPaused = false;
         resultsScreen.style.display = "none";
         stats = { head: 0, body: 0, miss: 0 };
-        mouseIntervals = [];
-        hzDrops = 0;
-        totalHzSamples = 0;
-        sumHz = 0;
+        hzDrops = 0; totalHzSamples = 0; sumHz = 0;
         timeLeft = 60;
         updateUI();
         respawn();
@@ -121,7 +119,6 @@
     function showFinalResults() {
         isPaused = true;
         clearInterval(countdownInterval);
-        
         document.getElementById('res-head').innerText = stats.head;
         document.getElementById('res-body').innerText = stats.body;
         document.getElementById('res-miss').innerText = stats.miss;
@@ -130,19 +127,18 @@
         document.getElementById('res-hz').innerText = avgHz + " Hz";
         
         const statusEl = document.getElementById('res-hz-status');
-        if (hzDrops > 5) {
-            statusEl.innerText = "ЕСТЬ ПРОСАДКИ";
+        // Порог просадки для 1k-8k мышей: если задержка между событиями > 5мс
+        if (hzDrops > 15) {
+            statusEl.innerText = "ЕСТЬ ПРОСАДКИ (fTPM?)";
             statusEl.style.color = "#ff4655";
         } else {
             statusEl.innerText = "СТАБИЛЬНО";
             statusEl.style.color = "#00ff00";
         }
-        
         resultsScreen.style.display = "block";
     }
 
     function closeResults() { resetGame(); }
-
     function updateUI() {
         headsDisp.innerText = stats.head;
         bodyDisp.innerText = stats.body;
@@ -150,28 +146,32 @@
         timerDisp.innerText = timeLeft;
     }
 
-    window.addEventListener('mousemove', e => { 
+    // Поддержка 8K Hz через Coalesced Events
+    window.addEventListener('pointermove', e => { 
         if (isPaused) return;
         
-        const now = performance.now();
-        const delta = now - lastMouseMoveTime;
+        // getCoalescedEvents вытягивает ВСЕ сигналы мыши между кадрами браузера
+        const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
         
-        if (delta > 0) {
-            const currentHz = 1000 / delta;
-            // Игнорируем слишком резкие скачки при простое, берем только активное движение
-            if (delta < 100) { 
+        events.forEach(event => {
+            const now = performance.now();
+            const delta = now - lastEventTime;
+            
+            if (delta > 0 && delta < 100) {
+                const currentHz = 1000 / delta;
                 sumHz += currentHz;
                 totalHzSamples++;
-                // Если интервал больше 4мс (для 1000Гц) или 8мс (для 500Гц), считаем за просадку
-                if (delta > 10) hzDrops++; 
+
+                // Детектор статтеров
+                if (delta > 5) hzDrops++; 
                 
-                if (totalHzSamples % 10 === 0) {
+                if (totalHzSamples % 50 === 0) {
                     mhzDisp.innerText = Math.round(currentHz);
                 }
             }
-        }
-        
-        lastMouseMoveTime = now;
+            lastEventTime = now;
+        });
+
         mouseX = e.clientX; 
         mouseY = e.clientY; 
     });
@@ -215,8 +215,7 @@
     }
 
     function drawDummy(x, y) {
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#ececec";
+        ctx.lineWidth = 3; ctx.strokeStyle = "#ececec";
         ctx.fillStyle = target.hp < 100 ? "#ff4655" : "#ececec";
         ctx.beginPath(); ctx.arc(x, y - 80, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         ctx.fillRect(x - 25, y - 55, 50, 70); ctx.strokeRect(x - 25, y - 55, 50, 70);
