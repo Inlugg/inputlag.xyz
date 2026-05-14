@@ -47,7 +47,6 @@
         <div class="stat-row"><span class="stat-label">Misses:</span> <span id="res-miss" class="res-val" style="color: #888;">0</span></div>
         <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
         <div class="stat-row"><span class="stat-label">Avg Mouse Rate:</span> <span id="res-hz" class="res-val" style="color: #00ff00;">0 Hz</span></div>
-        <div class="stat-row"><span class="stat-label">Стабильность:</span> <span id="res-hz-status" class="res-val" style="font-size: 16px;">--</span></div>
         <br>
         <button class="btn-reset" onclick="resetGame()">Начать заново</button>
     </div>
@@ -68,7 +67,6 @@
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d', { desynchronized: true });
     
-    // UI элементы
     const timerDisp = document.getElementById('timer');
     const headsDisp = document.getElementById('heads');
     const bodyDisp = document.getElementById('body');
@@ -83,12 +81,11 @@
     let timeLeft = 60, countdownInterval;
     let target = { x: 0, y: 0, hp: 100 };
 
-    // Система замера герцовки (накопительная для 1k-8k Hz)
+    // Система замера герцовки (накопительная)
     let eventCount = 0;
     let lastHzUpdate = performance.now();
     let sumHzForAvg = 0;
     let totalHzTicks = 0;
-    let maxHzReached = 0;
 
     function respawn() {
         const safeMarginLeft = 320;
@@ -102,7 +99,7 @@
         isPaused = false;
         resultsScreen.style.display = "none";
         stats = { head: 0, body: 0, miss: 0 };
-        eventCount = 0; sumHzForAvg = 0; totalHzTicks = 0; maxHzReached = 0;
+        eventCount = 0; sumHzForAvg = 0; totalHzTicks = 0;
         timeLeft = 60;
         updateUI();
         respawn();
@@ -128,15 +125,6 @@
         const avgHz = totalHzTicks > 0 ? Math.round(sumHzForAvg / totalHzTicks) : 0;
         document.getElementById('res-hz').innerText = avgHz + " Hz";
         
-        const statusEl = document.getElementById('res-hz-status');
-        // Если средняя герцовка сильно ниже 900 при целевой 1000, или есть рывки
-        if (avgHz < 800 && avgHz > 50) {
-            statusEl.innerText = "ЕСТЬ ПРОСАДКИ (Check BIOS/fTPM)";
-            statusEl.style.color = "#ff4655";
-        } else {
-            statusEl.innerText = "СТАБИЛЬНО";
-            statusEl.style.color = "#00ff00";
-        }
         resultsScreen.style.display = "block";
     }
 
@@ -147,7 +135,7 @@
         timerDisp.innerText = timeLeft;
     }
 
-    // НОВАЯ ЛОГИКА ВВОДА: Считаем события независимо от кадров
+    // Обработка ввода (поддержка до 8k Hz)
     window.addEventListener('pointermove', e => { 
         const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
         eventCount += events.length;
@@ -155,12 +143,11 @@
         const now = performance.now();
         const elapsed = now - lastHzUpdate;
 
-        // Обновляем счетчик каждые 500мс для точности
         if (elapsed >= 500) {
             const currentHz = Math.round((eventCount / elapsed) * 1000);
             mhzDisp.innerText = currentHz;
             
-            if (currentHz > 100) { // Игнорируем простои
+            if (currentHz > 100) {
                 sumHzForAvg += currentHz;
                 totalHzTicks++;
             }
@@ -215,11 +202,8 @@
         ctx.lineWidth = 3; ctx.strokeStyle = "#ececec";
         ctx.fillStyle = target.hp < 100 ? "#ff4655" : "#ececec";
         
-        // Голова
         ctx.beginPath(); ctx.arc(x, y - 80, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        // Тело
         ctx.fillRect(x - 25, y - 55, 50, 70); ctx.strokeRect(x - 25, y - 55, 50, 70);
-        // Руки и ноги (схематично)
         ctx.beginPath();
         ctx.moveTo(x - 25, y - 50); ctx.lineTo(x - 45, y + 10);
         ctx.moveTo(x + 25, y - 50); ctx.lineTo(x + 45, y + 10);
@@ -236,7 +220,6 @@
             drawDummy(target.x, target.y);
         }
 
-        // Прицел
         ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2; ctx.beginPath();
         ctx.moveTo(mouseX - 10, mouseY); ctx.lineTo(mouseX + 10, mouseY);
         ctx.moveTo(mouseX, mouseY - 10); ctx.lineTo(mouseX, mouseY + 10); ctx.stroke();
