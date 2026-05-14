@@ -1,216 +1,201 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIM Training — Тренажер аима и реакции (Tracking & Gridshot)</title>
-    
-    <meta name="description" content="Бесплатный онлайн тренажер для улучшения аима. Режимы Tracking и Gridshot. Разминка перед каткой в Valorant, CS 2 и Apex Legends. Проверь свой инпут-лаг!">
-    <meta name="keywords" content="аим тест, тренировка аима, aim trainer, gridshot online, tracking aim, разминка для геймеров, реакция тест, тренировка реакции">
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="Input Lag Lab">
-
-    <meta property="og:title" content="Aim Training Hub — Прокачай свой скилл">
-    <meta property="og:description" content="Два режима тренировки: ведение цели и скорость реакции. Стань точнее прямо в браузере!">
-    <meta property="og:type" content="website">
+    <title>Valorant Aim Trainer: Safe Zone</title>
     <style>
-        body { background: #111; color: #fff; font-family: Arial, sans-serif; text-align: center; padding-bottom: 50px; }
+        body { margin: 0; overflow: hidden; background: #050505; color: #00ff00; font-family: 'Segoe UI', sans-serif; }
+        canvas { display: block; cursor: none; }
         
-        .game-container { margin-bottom: 80px; }
-
-        #status-panel, #status-panel-2 {
-            background: #222 !important;
-            border: 2px solid #ff4655 !important;
-            display: inline-block !important;
-            padding: 15px 30px !important;
-            margin: 20px auto !important;
-            border-radius: 10px !important;
+        .ui { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0,0,0,0.95); padding: 20px; 
+            border: 1px solid #ff4655; pointer-events: auto; 
+            width: 220px; box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
+            z-index: 10;
         }
 
-        .stat-text {
-            display: inline-block !important;
-            font-size: 36px !important;
-            font-weight: bold !important;
-            margin: 0 20px !important;
-            color: #fff !important;
+        .btn-reset {
+            background: #ff4655; color: white; border: none;
+            padding: 10px; width: 100%; cursor: pointer;
+            font-weight: bold; font-family: monospace; text-transform: uppercase;
+            margin-bottom: 15px; transition: 0.2s;
         }
+        .btn-reset:hover { background: #ff5f6c; box-shadow: 0 0 10px #ff4655; }
 
-        .timer-val { color: #ff4655 !important; }
-        .score-val { color: #00ffcc !important; }
-
-        .game-area {
-            width: 90vw; height: 500px; max-width: 1000px;
-            background: #000; margin: 0 auto; position: relative;
-            border: 3px solid #333; overflow: hidden; cursor: none;
-            border-radius: 15px;
-            /* ЦЕНТРИРОВАНИЕ КНОПКИ */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .aim-cursor {
-            width: 10px; height: 10px; 
-            background: #ffffff !important;
-            border-radius: 50%; position: absolute;
-            pointer-events: none; display: none; z-index: 999;
-            box-shadow: 0 0 8px #ffffff;
-            filter: none !important; 
-            mix-blend-mode: normal !important;
-        }
-
-        .target {
-            width: 50px; height: 50px; background: #33ff00;
-            border-radius: 50%; position: absolute; display: none;
-            box-shadow: 0 0 20px #33ff00;
-        }
-
-        .target-2 {
-            width: 40px; height: 40px; background: #ff00ff;
-            border-radius: 50%; position: absolute; display: none;
-            box-shadow: 0 0 15px #ff00ff;
-        }
-
-        .main-btn {
-            padding: 20px 40px; background: #ff4655; color: #fff;
-            border: none; font-size: 20px; cursor: pointer;
-            border-radius: 8px; font-weight: bold;
-            z-index: 1000; /* Чтобы кнопка всегда была сверху */
-        }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #222; padding-bottom: 2px; }
+        .val { color: #fff; font-size: 18px; font-weight: bold; font-family: monospace; }
+        .stat-label { color: #888; font-size: 12px; text-transform: uppercase; align-self: center; }
+        .timer { color: #ff4655; font-size: 36px; font-weight: bold; text-align: center; display: block; margin-top: 10px;}
         
-        .main-btn:hover { background: #ff5f6d; }
+        #hit-type { height: 25px; text-align: center; margin-top: 10px; font-weight: bold; font-size: 16px; }
 
-        h1 { color: #ff4655; margin-top: 40px; text-transform: uppercase; }
-        .desc { color: #888; margin-bottom: 10px; }
+        #results-screen {
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(10, 10, 10, 0.95); padding: 40px; border: 2px solid #ff4655;
+            text-align: center; z-index: 100; min-width: 300px;
+        }
+        .res-val { color: #ff4655; font-size: 28px; font-weight: bold; }
     </style>
 </head>
 <body>
-
-    <div class="game-container">
-        <h1>1. TRACKING TRAINER</h1>
-        <p class="desc">Удерживай прицел на шаре.</p>
-        <div id="status-panel">
-            <div class="stat-text">ВРЕМЯ: <span id="timer-val" class="timer-val">60</span></div>
-            <div class="stat-text">СЧЕТ: <span id="score-val" class="score-val">0</span></div>
-        </div>
-
-        <div id="game-area-1" class="game-area">
-            <div id="aim-cursor-1" class="aim-cursor"></div>
-            <div id="target-dot" class="target"></div>
-            <button id="btn-1" class="main-btn" onclick="startTracking()">НАЧАТЬ ТРЕКИНГ</button>
-        </div>
+    <div id="results-screen">
+        <h2 style="color: #fff; text-transform: uppercase;">Раунд окончен</h2>
+        <div class="stat-row"><span class="stat-label">Headshots:</span> <span id="res-head" class="res-val">0</span></div>
+        <div class="stat-row"><span class="stat-label">Body Hits:</span> <span id="res-body" class="res-val">0</span></div>
+        <div class="stat-row"><span class="stat-label">Misses:</span> <span id="res-miss" class="res-val" style="color: #888;">0</span></div>
+        <br>
+        <button class="btn-reset" onclick="closeResults()">Продолжить</button>
     </div>
 
-    <div class="game-container">
-        <h1>2. GRIDSHOT REFLEX</h1>
-        <p class="desc">Кликай по мишеням максимально быстро.</p>
-        <div id="status-panel-2">
-            <div class="stat-text">ВРЕМЯ: <span id="timer-val-2" class="timer-val">60</span></div>
-            <div class="stat-text">СЧЕТ: <span id="score-val-2" class="score-val">0</span></div>
-        </div>
-
-        <div id="game-area-2" class="game-area">
-            <div id="aim-cursor-2" class="aim-cursor"></div>
-            <div id="t1" class="target target-2" onclick="hitTarget(this)"></div>
-            <div id="t2" class="target target-2" onclick="hitTarget(this)"></div>
-            <div id="t3" class="target target-2" onclick="hitTarget(this)"></div>
-            <button id="btn-2" class="main-btn" onclick="startGridshot()">НАЧАТЬ ГРИДШОТ</button>
-        </div>
+    <div class="ui" id="stats-panel">
+        <button class="btn-reset" onclick="resetGame()">Начать заново</button>
+        <div class="stat-row"><span class="stat-label">FPS:</span> <span id="fps" class="val">0</span></div>
+        <div class="stat-row"><span class="stat-label">Heads:</span> <span id="heads" class="val" style="color: #ff4655;">0</span></div>
+        <div class="stat-row"><span class="stat-label">Body:</span> <span id="body" class="val">0</span></div>
+        <div class="stat-row"><span class="stat-label">Misses:</span> <span id="misses" class="val" style="color: #888;">0</span></div>
+        <div id="hit-type"></div>
+        <span id="timer" class="timer">60</span>
     </div>
+    <canvas id="game"></canvas>
 
-    <script>
-        // ЛОГИКА ТРЕКИНГА
-        let sec1 = 60, pts1 = 0, playing1 = false, tick1;
-        const area1 = document.getElementById('game-area-1');
-        const curs1 = document.getElementById('aim-cursor-1');
-        const dot1 = document.getElementById('target-dot');
-        const btn1 = document.getElementById('btn-1');
+<script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const timerDisp = document.getElementById('timer');
+    const headsDisp = document.getElementById('heads');
+    const bodyDisp = document.getElementById('body');
+    const missesDisp = document.getElementById('misses');
+    const fpsDisp = document.getElementById('fps');
+    const hitDisp = document.getElementById('hit-type');
+    const resultsScreen = document.getElementById('results-screen');
 
-        function startTracking() {
-            if(playing1) return;
-            sec1 = 60; pts1 = 0; playing1 = true;
-            document.getElementById('score-val').innerHTML = pts1;
-            btn1.style.display = 'none';
-            dot1.style.display = 'block';
-            curs1.style.display = 'block';
-            moveDot();
-            tick1 = setInterval(() => {
-                sec1--;
-                document.getElementById('timer-val').innerHTML = sec1;
-                if(sec1 <= 0) stopTracking();
-            }, 1000);
+    let mouseX = 0, mouseY = 0;
+    let lastFrameTime = performance.now();
+    let canFire = true, isPaused = false;
+    let stats = { head: 0, body: 0, miss: 0 };
+    let timeLeft = 60, lastFpsUpdate = 0, countdownInterval;
+    let target = { x: 0, y: 0, hp: 100 };
+
+    function respawn() {
+        // Безопасная зона: отступаем 300px слева (ширина панели 220 + запас)
+        const safeMarginLeft = 300;
+        const safeMarginRight = 100;
+        const safeMarginTop = 150;
+        const safeMarginBottom = 150;
+
+        target.x = Math.random() * (window.innerWidth - safeMarginLeft - safeMarginRight) + safeMarginLeft;
+        target.y = Math.random() * (window.innerHeight - safeMarginTop - safeMarginBottom) + safeMarginTop;
+        target.hp = 100;
+    }
+
+    function resetGame() {
+        clearInterval(countdownInterval);
+        isPaused = false;
+        resultsScreen.style.display = "none";
+        stats = { head: 0, body: 0, miss: 0 };
+        timeLeft = 60;
+        updateUI();
+        respawn();
+        startTimer();
+    }
+
+    function startTimer() {
+        countdownInterval = setInterval(() => {
+            if (isPaused) return;
+            timeLeft--;
+            timerDisp.innerText = timeLeft;
+            if (timeLeft <= 0) showFinalResults();
+        }, 1000);
+    }
+
+    function showFinalResults() {
+        isPaused = true;
+        clearInterval(countdownInterval);
+        document.getElementById('res-head').innerText = stats.head;
+        document.getElementById('res-body').innerText = stats.body;
+        document.getElementById('res-miss').innerText = stats.miss;
+        resultsScreen.style.display = "block";
+    }
+
+    function closeResults() { resetGame(); }
+
+    function updateUI() {
+        headsDisp.innerText = stats.head;
+        bodyDisp.innerText = stats.body;
+        missesDisp.innerText = stats.miss;
+        timerDisp.innerText = timeLeft;
+    }
+
+    window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+    window.addEventListener('mousedown', () => {
+        if (!canFire || timeLeft <= 0 || isPaused) return;
+        checkShot();
+        canFire = false;
+    });
+    window.addEventListener('mouseup', () => { canFire = true; });
+
+    function checkShot() {
+        let isHit = false;
+        let distHead = Math.hypot(mouseX - target.x, mouseY - (target.y - 80));
+        
+        if (distHead < 18) {
+            stats.head++;
+            target.hp = 0;
+            showHitFeedback("HEADSHOT!", "#ff4655");
+            isHit = true;
+        } else if (mouseX > target.x - 25 && mouseX < target.x + 25 &&
+                 mouseY > target.y - 55 && mouseY < target.y + 15) {
+            stats.body++;
+            target.hp -= 40;
+            showHitFeedback("BODY (-40)", "#fff");
+            isHit = true;
         }
 
-        function moveDot() {
-            dot1.style.left = Math.random() * (area1.clientWidth - 60) + "px";
-            dot1.style.top = Math.random() * (area1.clientHeight - 60) + "px";
+        if (isHit) {
+            if (target.hp <= 0) respawn();
+        } else {
+            stats.miss++;
+            showHitFeedback("MISS", "#555");
         }
+        updateUI();
+    }
 
-        function stopTracking() {
-            playing1 = false; clearInterval(tick1);
-            dot1.style.display = 'none'; curs1.style.display = 'none';
-            btn1.style.display = 'block';
-            alert("Tracking Score: " + pts1);
+    function showHitFeedback(text, color) {
+        hitDisp.innerText = text;
+        hitDisp.style.color = color;
+    }
+
+    function drawDummy(x, y) {
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "#ececec";
+        ctx.fillStyle = target.hp < 100 ? "#ff4655" : "#ececec";
+        ctx.beginPath(); ctx.arc(x, y - 80, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillRect(x - 25, y - 55, 50, 70); ctx.strokeRect(x - 25, y - 55, 50, 70);
+        ctx.beginPath();
+        ctx.moveTo(x - 25, y - 50); ctx.lineTo(x - 45, y + 10);
+        ctx.moveTo(x + 25, y - 50); ctx.lineTo(x + 45, y + 10);
+        ctx.moveTo(x - 15, y + 15); ctx.lineTo(x - 25, y + 70);
+        ctx.moveTo(x + 15, y + 15); ctx.lineTo(x + 25, y + 70);
+        ctx.stroke();
+    }
+
+    function loop(now) {
+        const deltaTime = now - lastFrameTime;
+        lastFrameTime = now;
+        if (now - lastFpsUpdate > 500) {
+            fpsDisp.innerText = Math.round(1000 / deltaTime);
+            lastFpsUpdate = now;
         }
-
-        area1.onmousemove = (e) => {
-            const r = area1.getBoundingClientRect();
-            const mx = e.clientX - r.left; const my = e.clientY - r.top;
-            curs1.style.left = (mx - 5) + 'px'; curs1.style.top = (my - 5) + 'px';
-            if(!playing1) return;
-            const tx = parseInt(dot1.style.left); const ty = parseInt(dot1.style.top);
-            if (mx > tx && mx < tx + 50 && my > ty && my < ty + 50) {
-                pts1++; document.getElementById('score-val').innerHTML = pts1;
-                moveDot();
-            }
-        };
-
-        // ЛОГИКА ГРИДШОТА
-        let sec2 = 60, pts2 = 0, playing2 = false, tick2;
-        const area2 = document.getElementById('game-area-2');
-        const curs2 = document.getElementById('aim-cursor-2');
-        const btn2 = document.getElementById('btn-2');
-        const targets = [document.getElementById('t1'), document.getElementById('t2'), document.getElementById('t3')];
-
-        function startGridshot() {
-            if(playing2) return;
-            sec2 = 60; pts2 = 0; playing2 = true;
-            document.getElementById('score-val-2').innerHTML = pts2;
-            btn2.style.display = 'none';
-            curs2.style.display = 'block';
-            targets.forEach(t => { t.style.display = 'block'; moveTarget(t); });
-            tick2 = setInterval(() => {
-                sec2--;
-                document.getElementById('timer-val-2').innerHTML = sec2;
-                if(sec2 <= 0) stopGridshot();
-            }, 1000);
-        }
-
-        function moveTarget(t) {
-            t.style.left = Math.random() * (area2.clientWidth - 50) + "px";
-            t.style.top = Math.random() * (area2.clientHeight - 50) + "px";
-        }
-
-        function hitTarget(t) {
-            if(!playing2) return;
-            pts2++;
-            document.getElementById('score-val-2').innerHTML = pts2;
-            moveTarget(t);
-        }
-
-        function stopGridshot() {
-            playing2 = false; clearInterval(tick2);
-            targets.forEach(t => t.style.display = 'none');
-            curs2.style.display = 'none';
-            btn2.style.display = 'block';
-            alert("Gridshot Score: " + pts2);
-        }
-
-        area2.onmousemove = (e) => {
-            const r = area2.getBoundingClientRect();
-            curs2.style.left = (e.clientX - r.left - 5) + 'px';
-            curs2.style.top = (e.clientY - r.top - 5) + 'px';
-        };
-    </script>
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        if (!isPaused) drawDummy(target.x, target.y);
+        ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2; ctx.beginPath();
+        ctx.moveTo(mouseX - 10, mouseY); ctx.lineTo(mouseX + 10, mouseY);
+        ctx.moveTo(mouseX, mouseY - 10); ctx.lineTo(mouseX, mouseY + 10); ctx.stroke();
+        requestAnimationFrame(loop);
+    }
+    resetGame();
+    requestAnimationFrame(loop);
+</script>
 </body>
 </html>
