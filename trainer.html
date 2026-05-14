@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Valorant Aim Trainer: Safe Zone</title>
+    <title>Valorant Aim Trainer: Polling Rate Monitor</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; color: #00ff00; font-family: 'Segoe UI', sans-serif; }
         canvas { display: block; cursor: none; }
@@ -10,8 +10,7 @@
             position: absolute; top: 20px; left: 20px; 
             background: rgba(0,0,0,0.95); padding: 20px; 
             border: 1px solid #ff4655; pointer-events: auto; 
-            width: 220px; box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
-            z-index: 10;
+            min-width: 220px; box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
         }
 
         .btn-reset {
@@ -24,7 +23,7 @@
 
         .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #222; padding-bottom: 2px; }
         .val { color: #fff; font-size: 18px; font-weight: bold; font-family: monospace; }
-        .stat-label { color: #888; font-size: 12px; text-transform: uppercase; align-self: center; }
+        .stat-label { color: #888; font-size: 11px; text-transform: uppercase; align-self: center; }
         .timer { color: #ff4655; font-size: 36px; font-weight: bold; text-align: center; display: block; margin-top: 10px;}
         
         #hit-type { height: 25px; text-align: center; margin-top: 10px; font-weight: bold; font-size: 16px; }
@@ -32,24 +31,28 @@
         #results-screen {
             display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(10, 10, 10, 0.95); padding: 40px; border: 2px solid #ff4655;
-            text-align: center; z-index: 100; min-width: 300px;
+            text-align: center; z-index: 100; min-width: 320px;
         }
-        .res-val { color: #ff4655; font-size: 28px; font-weight: bold; }
+        .res-val { color: #ff4655; font-size: 24px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div id="results-screen">
-        <h2 style="color: #fff; text-transform: uppercase;">Раунд окончен</h2>
+        <h2 style="color: #fff; text-transform: uppercase; margin-top: 0;">Раунд окончен</h2>
         <div class="stat-row"><span class="stat-label">Headshots:</span> <span id="res-head" class="res-val">0</span></div>
         <div class="stat-row"><span class="stat-label">Body Hits:</span> <span id="res-body" class="res-val">0</span></div>
         <div class="stat-row"><span class="stat-label">Misses:</span> <span id="res-miss" class="res-val" style="color: #888;">0</span></div>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
+        <div class="stat-row"><span class="stat-label">Avg Polling Rate:</span> <span id="res-hz" class="res-val" style="color: #00ff00;">0 Hz</span></div>
+        <div class="stat-row"><span class="stat-label">Стабильность:</span> <span id="res-hz-status" class="res-val" style="font-size: 16px;">ОК</span></div>
         <br>
         <button class="btn-reset" onclick="closeResults()">Продолжить</button>
     </div>
 
-    <div class="ui" id="stats-panel">
+    <div class="ui">
         <button class="btn-reset" onclick="resetGame()">Начать заново</button>
         <div class="stat-row"><span class="stat-label">FPS:</span> <span id="fps" class="val">0</span></div>
+        <div class="stat-row"><span class="stat-label">Mouse Hz:</span> <span id="mhz" class="val" style="color: #00ff00;">0</span></div>
         <div class="stat-row"><span class="stat-label">Heads:</span> <span id="heads" class="val" style="color: #ff4655;">0</span></div>
         <div class="stat-row"><span class="stat-label">Body:</span> <span id="body" class="val">0</span></div>
         <div class="stat-row"><span class="stat-label">Misses:</span> <span id="misses" class="val" style="color: #888;">0</span></div>
@@ -66,6 +69,7 @@
     const bodyDisp = document.getElementById('body');
     const missesDisp = document.getElementById('misses');
     const fpsDisp = document.getElementById('fps');
+    const mhzDisp = document.getElementById('mhz');
     const hitDisp = document.getElementById('hit-type');
     const resultsScreen = document.getElementById('results-screen');
 
@@ -76,15 +80,17 @@
     let timeLeft = 60, lastFpsUpdate = 0, countdownInterval;
     let target = { x: 0, y: 0, hp: 100 };
 
-    function respawn() {
-        // Безопасная зона: отступаем 300px слева (ширина панели 220 + запас)
-        const safeMarginLeft = 300;
-        const safeMarginRight = 100;
-        const safeMarginTop = 150;
-        const safeMarginBottom = 150;
+    // Переменные для герцовки мыши
+    let lastMouseMoveTime = performance.now();
+    let mouseIntervals = [];
+    let hzDrops = 0;
+    let totalHzSamples = 0;
+    let sumHz = 0;
 
-        target.x = Math.random() * (window.innerWidth - safeMarginLeft - safeMarginRight) + safeMarginLeft;
-        target.y = Math.random() * (window.innerHeight - safeMarginTop - safeMarginBottom) + safeMarginTop;
+    function respawn() {
+        const safeMarginLeft = 300;
+        target.x = Math.random() * (window.innerWidth - safeMarginLeft - 100) + safeMarginLeft;
+        target.y = Math.random() * (window.innerHeight - 300) + 150;
         target.hp = 100;
     }
 
@@ -93,6 +99,10 @@
         isPaused = false;
         resultsScreen.style.display = "none";
         stats = { head: 0, body: 0, miss: 0 };
+        mouseIntervals = [];
+        hzDrops = 0;
+        totalHzSamples = 0;
+        sumHz = 0;
         timeLeft = 60;
         updateUI();
         respawn();
@@ -111,9 +121,23 @@
     function showFinalResults() {
         isPaused = true;
         clearInterval(countdownInterval);
+        
         document.getElementById('res-head').innerText = stats.head;
         document.getElementById('res-body').innerText = stats.body;
         document.getElementById('res-miss').innerText = stats.miss;
+        
+        const avgHz = totalHzSamples > 0 ? Math.round(sumHz / totalHzSamples) : 0;
+        document.getElementById('res-hz').innerText = avgHz + " Hz";
+        
+        const statusEl = document.getElementById('res-hz-status');
+        if (hzDrops > 5) {
+            statusEl.innerText = "ЕСТЬ ПРОСАДКИ";
+            statusEl.style.color = "#ff4655";
+        } else {
+            statusEl.innerText = "СТАБИЛЬНО";
+            statusEl.style.color = "#00ff00";
+        }
+        
         resultsScreen.style.display = "block";
     }
 
@@ -126,7 +150,32 @@
         timerDisp.innerText = timeLeft;
     }
 
-    window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+    window.addEventListener('mousemove', e => { 
+        if (isPaused) return;
+        
+        const now = performance.now();
+        const delta = now - lastMouseMoveTime;
+        
+        if (delta > 0) {
+            const currentHz = 1000 / delta;
+            // Игнорируем слишком резкие скачки при простое, берем только активное движение
+            if (delta < 100) { 
+                sumHz += currentHz;
+                totalHzSamples++;
+                // Если интервал больше 4мс (для 1000Гц) или 8мс (для 500Гц), считаем за просадку
+                if (delta > 10) hzDrops++; 
+                
+                if (totalHzSamples % 10 === 0) {
+                    mhzDisp.innerText = Math.round(currentHz);
+                }
+            }
+        }
+        
+        lastMouseMoveTime = now;
+        mouseX = e.clientX; 
+        mouseY = e.clientY; 
+    });
+
     window.addEventListener('mousedown', () => {
         if (!canFire || timeLeft <= 0 || isPaused) return;
         checkShot();
