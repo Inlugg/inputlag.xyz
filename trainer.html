@@ -1,96 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>8K Hz Ultra Aim Trainer</title>
+    <title>8K Hz Unlocked Aim Trainer</title>
     <style>
         body { margin: 0; overflow: hidden; background: #050505; color: #00ff00; font-family: 'Segoe UI', sans-serif; }
         canvas { display: block; cursor: none; }
-        
         .ui { 
             position: absolute; top: 20px; left: 20px; 
             background: rgba(0,0,0,0.95); padding: 20px; 
-            border: 1px solid #ff4655; pointer-events: auto; 
-            width: 220px; box-shadow: 0 0 20px rgba(255, 70, 85, 0.2);
-            z-index: 10;
+            border: 1px solid #ff4655; width: 220px; z-index: 10;
         }
-
         .btn-reset {
             background: #ff4655; color: white; border: none;
             padding: 10px; width: 100%; cursor: pointer;
-            font-weight: bold; font-family: monospace; text-transform: uppercase;
-            margin-bottom: 15px; transition: 0.2s;
+            font-weight: bold; text-transform: uppercase; margin-bottom: 15px;
         }
-        .btn-reset:hover { background: #ff5f6c; box-shadow: 0 0 10px #ff4655; }
-
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #222; padding-bottom: 2px; }
-        .val { color: #fff; font-size: 18px; font-weight: bold; font-family: monospace; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #222; }
+        .val { color: #fff; font-size: 20px; font-weight: bold; font-family: monospace; }
         .stat-label { color: #888; font-size: 11px; text-transform: uppercase; align-self: center; }
-        .timer { color: #ff4655; font-size: 36px; font-weight: bold; text-align: center; display: block; margin-top: 10px;}
-        
-        #hit-type { height: 25px; text-align: center; margin-top: 10px; font-weight: bold; font-size: 16px; }
-
+        .timer { color: #ff4655; font-size: 36px; font-weight: bold; text-align: center; display: block; }
         #results-screen {
             display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: rgba(10, 10, 10, 0.98); padding: 40px; border: 2px solid #ff4655;
             text-align: center; z-index: 100; min-width: 320px;
         }
-        .res-val { color: #ff4655; font-size: 24px; font-weight: bold; }
     </style>
 </head>
 <body>
     <div id="results-screen">
-        <h2 style="color: #fff; text-transform: uppercase; margin-top: 0;">Раунд окончен</h2>
-        <div class="stat-row"><span class="stat-label">Headshots:</span> <span id="res-head" class="res-val">0</span></div>
-        <div class="stat-row"><span class="stat-label">Body Hits:</span> <span id="res-body" class="res-val">0</span></div>
-        <div class="stat-row"><span class="stat-label">Misses:</span> <span id="res-miss" class="res-val" style="color: #888;">0</span></div>
-        <hr style="border: 0; border-top: 1px solid #333; margin: 15px 0;">
-        <div class="stat-row"><span class="stat-label">AVG Polling Rate:</span> <span id="res-hz" class="res-val" style="color: #00ff00;">0 Hz</span></div>
-        <div class="stat-row"><span class="stat-label">Стабильность:</span> <span id="res-hz-status" class="res-val" style="font-size: 16px;">--</span></div>
+        <h2 style="color: #fff; text-transform: uppercase;">Результат</h2>
+        <div class="stat-row"><span class="stat-label">AVG Polling Rate:</span> <span id="res-hz" class="val" style="color: #00ff00;">0 Hz</span></div>
+        <div class="stat-row"><span class="stat-label">Стабильность:</span> <span id="res-hz-status" class="val">--</span></div>
         <br>
-        <button class="btn-reset" onclick="closeResults()">Продолжить</button>
+        <button class="btn-reset" onclick="resetGame()">В бой</button>
     </div>
 
     <div class="ui">
-        <button class="btn-reset" onclick="resetGame()">Начать заново</button>
-        <div class="stat-row"><span class="stat-label">FPS:</span> <span id="fps" class="val">0</span></div>
+        <button class="btn-reset" onclick="resetGame()">Reset</button>
         <div class="stat-row"><span class="stat-label">Mouse Hz:</span> <span id="mhz" class="val" style="color: #00ff00;">0</span></div>
-        <div class="stat-row"><span class="stat-label">Heads:</span> <span id="heads" class="val" style="color: #ff4655;">0</span></div>
-        <div class="stat-row"><span class="stat-label">Body:</span> <span id="body" class="val">0</span></div>
-        <div class="stat-row"><span class="stat-label">Misses:</span> <span id="misses" class="val" style="color: #888;">0</span></div>
-        <div id="hit-type"></div>
+        <div class="stat-row"><span class="stat-label">Heads:</span> <span id="heads" class="val">0</span></div>
+        <div id="hit-type" style="text-align:center; height:20px; margin: 10px 0;"></div>
         <span id="timer" class="timer">60</span>
     </div>
     <canvas id="game"></canvas>
 
 <script>
     const canvas = document.getElementById('game');
-    const ctx = canvas.getContext('2d');
-    const timerDisp = document.getElementById('timer');
-    const headsDisp = document.getElementById('heads');
-    const bodyDisp = document.getElementById('body');
-    const missesDisp = document.getElementById('misses');
-    const fpsDisp = document.getElementById('fps');
-    const mhzDisp = document.getElementById('mhz');
-    const hitDisp = document.getElementById('hit-type');
-    const resultsScreen = document.getElementById('results-screen');
-
+    // desynchronized: true — отключает VSync для канваса, минимизирует задержку
+    const ctx = canvas.getContext('2d', { desynchronized: true });
+    
     let mouseX = 0, mouseY = 0;
-    let lastFrameTime = performance.now();
-    let canFire = true, isPaused = false;
     let stats = { head: 0, body: 0, miss: 0 };
-    let timeLeft = 60, lastFpsUpdate = 0, countdownInterval;
+    let timeLeft = 60, isPaused = false, countdownInterval;
     let target = { x: 0, y: 0, hp: 100 };
 
-    // Система мониторинга герцовки (Ultra High Rate)
+    // High-Res Polling Data
     let lastEventTime = performance.now();
-    let hzDrops = 0;
-    let totalHzSamples = 0;
-    let sumHz = 0;
+    let sumHz = 0, totalHzSamples = 0, hzDrops = 0;
 
     function respawn() {
-        // Учет левой колонки (300px запаса)
-        const safeMarginLeft = 320; 
-        target.x = Math.random() * (window.innerWidth - safeMarginLeft - 100) + safeMarginLeft;
+        target.x = Math.random() * (window.innerWidth - 400) + 350;
         target.y = Math.random() * (window.innerHeight - 300) + 150;
         target.hp = 100;
     }
@@ -98,62 +67,42 @@
     function resetGame() {
         clearInterval(countdownInterval);
         isPaused = false;
-        resultsScreen.style.display = "none";
+        document.getElementById('results-screen').style.display = "none";
         stats = { head: 0, body: 0, miss: 0 };
-        hzDrops = 0; totalHzSamples = 0; sumHz = 0;
+        sumHz = 0; totalHzSamples = 0; hzDrops = 0;
         timeLeft = 60;
         updateUI();
         respawn();
-        startTimer();
-    }
-
-    function startTimer() {
         countdownInterval = setInterval(() => {
             if (isPaused) return;
             timeLeft--;
-            timerDisp.innerText = timeLeft;
+            document.getElementById('timer').innerText = timeLeft;
             if (timeLeft <= 0) showFinalResults();
         }, 1000);
     }
 
     function showFinalResults() {
         isPaused = true;
-        clearInterval(countdownInterval);
-        document.getElementById('res-head').innerText = stats.head;
-        document.getElementById('res-body').innerText = stats.body;
-        document.getElementById('res-miss').innerText = stats.miss;
-        
         const avgHz = totalHzSamples > 0 ? Math.round(sumHz / totalHzSamples) : 0;
         document.getElementById('res-hz').innerText = avgHz + " Hz";
-        
         const statusEl = document.getElementById('res-hz-status');
-        // Порог просадки для 1k-8k мышей: если задержка между событиями > 5мс
-        if (hzDrops > 15) {
-            statusEl.innerText = "ЕСТЬ ПРОСАДКИ (fTPM?)";
-            statusEl.style.color = "#ff4655";
+        if (hzDrops > 20) {
+            statusEl.innerText = "ПРОСАДКИ"; statusEl.style.color = "#ff4655";
         } else {
-            statusEl.innerText = "СТАБИЛЬНО";
-            statusEl.style.color = "#00ff00";
+            statusEl.innerText = "СТАБИЛЬНО"; statusEl.style.color = "#00ff00";
         }
-        resultsScreen.style.display = "block";
+        document.getElementById('results-screen').style.display = "block";
     }
 
-    function closeResults() { resetGame(); }
     function updateUI() {
-        headsDisp.innerText = stats.head;
-        bodyDisp.innerText = stats.body;
-        missesDisp.innerText = stats.miss;
-        timerDisp.innerText = timeLeft;
+        document.getElementById('heads').innerText = stats.head;
     }
 
-    // Поддержка 8K Hz через Coalesced Events
+    // КЛЮЧЕВОЙ БЛОК: Обработка ввода вне цикла отрисовки
     window.addEventListener('pointermove', e => { 
-        if (isPaused) return;
-        
-        // getCoalescedEvents вытягивает ВСЕ сигналы мыши между кадрами браузера
         const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
         
-        events.forEach(event => {
+        for (let i = 0; i < events.length; i++) {
             const now = performance.now();
             const delta = now - lastEventTime;
             
@@ -161,89 +110,49 @@
                 const currentHz = 1000 / delta;
                 sumHz += currentHz;
                 totalHzSamples++;
-
-                // Детектор статтеров
-                if (delta > 5) hzDrops++; 
+                if (delta > 2) hzDrops++; // Порог статтера для 1k+ Hz
                 
-                if (totalHzSamples % 50 === 0) {
-                    mhzDisp.innerText = Math.round(currentHz);
+                // Обновляем счетчик на UI не слишком часто, чтобы не жрать ресурсы
+                if (totalHzSamples % 100 === 0) {
+                    document.getElementById('mhz').innerText = Math.round(currentHz);
                 }
             }
             lastEventTime = now;
-        });
-
+        }
         mouseX = e.clientX; 
         mouseY = e.clientY; 
-    });
+    }, { passive: true });
 
     window.addEventListener('mousedown', () => {
-        if (!canFire || timeLeft <= 0 || isPaused) return;
-        checkShot();
-        canFire = false;
-    });
-    window.addEventListener('mouseup', () => { canFire = true; });
-
-    function checkShot() {
-        let isHit = false;
+        if (isPaused) return;
         let distHead = Math.hypot(mouseX - target.x, mouseY - (target.y - 80));
-        
-        if (distHead < 18) {
+        if (distHead < 20) {
             stats.head++;
-            target.hp = 0;
-            showHitFeedback("HEADSHOT!", "#ff4655");
-            isHit = true;
-        } else if (mouseX > target.x - 25 && mouseX < target.x + 25 &&
-                 mouseY > target.y - 55 && mouseY < target.y + 15) {
-            stats.body++;
-            target.hp -= 40;
-            showHitFeedback("BODY (-40)", "#fff");
-            isHit = true;
+            respawn();
+            updateUI();
         }
+    });
 
-        if (isHit) {
-            if (target.hp <= 0) respawn();
-        } else {
-            stats.miss++;
-            showHitFeedback("MISS", "#555");
-        }
-        updateUI();
-    }
-
-    function showHitFeedback(text, color) {
-        hitDisp.innerText = text;
-        hitDisp.style.color = color;
-    }
-
-    function drawDummy(x, y) {
-        ctx.lineWidth = 3; ctx.strokeStyle = "#ececec";
-        ctx.fillStyle = target.hp < 100 ? "#ff4655" : "#ececec";
-        ctx.beginPath(); ctx.arc(x, y - 80, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillRect(x - 25, y - 55, 50, 70); ctx.strokeRect(x - 25, y - 55, 50, 70);
-        ctx.beginPath();
-        ctx.moveTo(x - 25, y - 50); ctx.lineTo(x - 45, y + 10);
-        ctx.moveTo(x + 25, y - 50); ctx.lineTo(x + 45, y + 10);
-        ctx.moveTo(x - 15, y + 15); ctx.lineTo(x - 25, y + 70);
-        ctx.moveTo(x + 15, y + 15); ctx.lineTo(x + 25, y + 70);
-        ctx.stroke();
-    }
-
-    function loop(now) {
-        const deltaTime = now - lastFrameTime;
-        lastFrameTime = now;
-        if (now - lastFpsUpdate > 500) {
-            fpsDisp.innerText = Math.round(1000 / deltaTime);
-            lastFpsUpdate = now;
-        }
+    function loop() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        if (!isPaused) drawDummy(target.x, target.y);
-        ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2; ctx.beginPath();
-        ctx.moveTo(mouseX - 10, mouseY); ctx.lineTo(mouseX + 10, mouseY);
-        ctx.moveTo(mouseX, mouseY - 10); ctx.lineTo(mouseX, mouseY + 10); ctx.stroke();
+        
+        if (!isPaused) {
+            // Отрисовка цели
+            ctx.fillStyle = "#ececec";
+            ctx.beginPath(); ctx.arc(target.x, target.y - 80, 20, 0, Math.PI * 2); ctx.fill();
+            ctx.fillRect(target.x - 25, target.y - 55, 50, 70);
+            
+            // Прицел
+            ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2; ctx.beginPath();
+            ctx.moveTo(mouseX - 10, mouseY); ctx.lineTo(mouseX + 10, mouseY);
+            ctx.moveTo(mouseX, mouseY - 10); ctx.lineTo(mouseX, mouseY + 10); ctx.stroke();
+        }
         requestAnimationFrame(loop);
     }
+
     resetGame();
-    requestAnimationFrame(loop);
+    loop();
 </script>
 </body>
 </html>
